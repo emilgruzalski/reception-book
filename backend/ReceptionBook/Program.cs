@@ -1,10 +1,14 @@
 using Microsoft.AspNetCore.HttpOverrides;
+using NLog;
 using ReceptionBook.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+LogManager.Setup().LoadConfigurationFromFile(Path.Combine(Directory.GetCurrentDirectory(), "nlog.config"));
+
 builder.Services.ConfigureCors();
 builder.Services.ConfigureIISIntegration();
+builder.Services.ConfigureLoggerService();
 
 builder.Services.AddControllers()
     .AddApplicationPart(typeof(ReceptionBook.Presentation.AssemblyReference).Assembly);
