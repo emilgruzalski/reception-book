@@ -23,8 +23,6 @@ public class RoomsController : ControllerBase
     public async Task<IActionResult> GetRoom(Guid id)
     {
         var room = await _service.RoomService.GetRoomAsync(id, trackChanges: false);
-        if (room is null)
-            return NotFound();
 
         return Ok(room);
     }

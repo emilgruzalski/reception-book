@@ -1,5 +1,7 @@
 using AutoMapper;
 using Contracts;
+using Entities.Exceptions;
+using Entities.Models;
 using Service.Contracts;
 using Shared.DataTransferObjects;
 
@@ -25,10 +27,19 @@ internal sealed class RoomService : IRoomService
         return _mapper.Map<IEnumerable<RoomDto>>(rooms);
     }
 
-    public async Task<RoomDto?> GetRoomAsync(Guid roomId, bool trackChanges)
+    public async Task<RoomDto> GetRoomAsync(Guid roomId, bool trackChanges)
+    {
+        var room = await GetRoomAndCheckIfItExists(roomId, trackChanges);
+
+        return _mapper.Map<RoomDto>(room);
+    }
+
+    private async Task<Room> GetRoomAndCheckIfItExists(Guid roomId, bool trackChanges)
     {
         var room = await _repository.Room.GetRoomAsync(roomId, trackChanges);
+        if (room is null)
+            throw new RoomNotFoundException(roomId);
 
-        return room is null ? null : _mapper.Map<RoomDto>(room);
+        return room;
     }
 }
