@@ -1,3 +1,4 @@
+using AutoMapper;
 using Contracts;
 using Service.Contracts;
 
@@ -7,10 +8,12 @@ internal sealed class GuestService : IGuestService
 {
     private readonly IRepositoryManager _repository;
     private readonly ILoggerManager _logger;
+    private readonly IMapper _mapper;
 
-    public GuestService(IRepositoryManager repository, ILoggerManager logger)
+    public GuestService(IRepositoryManager repository, ILoggerManager logger, IMapper mapper)
     {
         _repository = repository;
         _logger = logger;
+        _mapper = mapper;
     }
 }

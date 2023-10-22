@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.HttpOverrides;
 using NLog;
+using System.Text.Json.Serialization;
 using ReceptionBook.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,8 +13,11 @@ builder.Services.ConfigureLoggerService();
 builder.Services.ConfigureRepositoryManager();
 builder.Services.ConfigureServiceManager();
 builder.Services.ConfigureSqlContext(builder.Configuration);
+builder.Services.AddAutoMapper(typeof(Program));
 
 builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
     .AddApplicationPart(typeof(ReceptionBook.Presentation.AssemblyReference).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();

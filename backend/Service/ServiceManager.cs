@@ -1,3 +1,4 @@
+using AutoMapper;
 using Contracts;
 using Service.Contracts;
 
@@ -9,11 +10,11 @@ public sealed class ServiceManager : IServiceManager
     private readonly Lazy<IGuestService> _guestService;
     private readonly Lazy<IReservationService> _reservationService;
 
-    public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger)
+    public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger, IMapper mapper)
     {
-        _roomService = new Lazy<IRoomService>(() => new RoomService(repositoryManager, logger));
-        _guestService = new Lazy<IGuestService>(() => new GuestService(repositoryManager, logger));
-        _reservationService = new Lazy<IReservationService>(() => new ReservationService(repositoryManager, logger));
+        _roomService = new Lazy<IRoomService>(() => new RoomService(repositoryManager, logger, mapper));
+        _guestService = new Lazy<IGuestService>(() => new GuestService(repositoryManager, logger, mapper));
+        _reservationService = new Lazy<IReservationService>(() => new ReservationService(repositoryManager, logger, mapper));
     }
 
     public IRoomService RoomService => _roomService.Value;
