@@ -19,4 +19,8 @@ public class RoomRepository : RepositoryBase<Room>, IRoomRepository
     public async Task<Room?> GetRoomAsync(Guid roomId, bool trackChanges) =>
         await FindByCondition(r => r.Id.Equals(roomId), trackChanges)
             .SingleOrDefaultAsync();
+
+    public void CreateRoom(Room room) => Create(room);
+
+    public void DeleteRoom(Room room) => Delete(room);
 }

@@ -34,6 +34,33 @@ internal sealed class RoomService : IRoomService
         return _mapper.Map<RoomDto>(room);
     }
 
+    public async Task<RoomDto> CreateRoomAsync(RoomForCreationDto roomForCreation)
+    {
+        var room = _mapper.Map<Room>(roomForCreation);
+        room.Status = RoomStatus.Available;
+
+        _repository.Room.CreateRoom(room);
+        await _repository.SaveAsync();
+
+        return _mapper.Map<RoomDto>(room);
+    }
+
+    public async Task UpdateRoomAsync(Guid roomId, RoomForUpdateDto roomForUpdate, bool trackChanges)
+    {
+        var room = await GetRoomAndCheckIfItExists(roomId, trackChanges);
+
+        _mapper.Map(roomForUpdate, room);
+        await _repository.SaveAsync();
+    }
+
+    public async Task DeleteRoomAsync(Guid roomId, bool trackChanges)
+    {
+        var room = await GetRoomAndCheckIfItExists(roomId, trackChanges);
+
+        _repository.Room.DeleteRoom(room);
+        await _repository.SaveAsync();
+    }
+
     private async Task<Room> GetRoomAndCheckIfItExists(Guid roomId, bool trackChanges)
     {
         var room = await _repository.Room.GetRoomAsync(roomId, trackChanges);

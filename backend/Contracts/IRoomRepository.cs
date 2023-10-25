@@ -6,4 +6,6 @@ public interface IRoomRepository
 {
     Task<IEnumerable<Room>> GetAllRoomsAsync(bool trackChanges);
     Task<Room?> GetRoomAsync(Guid roomId, bool trackChanges);
+    void CreateRoom(Room room);
+    void DeleteRoom(Room room);
 }

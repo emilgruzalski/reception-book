@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Service.Contracts;
+using Shared.DataTransferObjects;
 
 namespace ReceptionBook.Presentation.Controllers;
 
@@ -25,5 +26,35 @@ public class RoomsController : ControllerBase
         var room = await _service.RoomService.GetRoomAsync(id, trackChanges: false);
 
         return Ok(room);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> CreateRoom([FromBody] RoomForCreationDto room)
+    {
+        if (room is null)
+            return BadRequest("RoomForCreationDto object is null");
+
+        var createdRoom = await _service.RoomService.CreateRoomAsync(room);
+
+        return CreatedAtRoute("RoomById", new { id = createdRoom.Id }, createdRoom);
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> UpdateRoom(Guid id, [FromBody] RoomForUpdateDto room)
+    {
+        if (room is null)
+            return BadRequest("RoomForUpdateDto object is null");
+
+        await _service.RoomService.UpdateRoomAsync(id, room, trackChanges: true);
+
+        return NoContent();
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteRoom(Guid id)
+    {
+        await _service.RoomService.DeleteRoomAsync(id, trackChanges: false);
+
+        return NoContent();
     }
 }
