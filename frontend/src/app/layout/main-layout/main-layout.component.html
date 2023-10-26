@@ -1,0 +1,22 @@
+<mat-toolbar color="primary" class="toolbar">
+  <button mat-icon-button (click)="sidenav.toggle()" aria-label="Przełącz menu">
+    <mat-icon>menu</mat-icon>
+  </button>
+  <span class="app-title">ReceptionBook</span>
+  <span class="spacer"></span>
+</mat-toolbar>
+
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav #sidenav mode="side" opened class="sidenav">
+    <mat-nav-list>
+      <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>Pulpit</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>
