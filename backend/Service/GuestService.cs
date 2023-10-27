@@ -1,6 +1,9 @@
 using AutoMapper;
 using Contracts;
+using Entities.Exceptions;
+using Entities.Models;
 using Service.Contracts;
+using Shared.DataTransferObjects;
 
 namespace Service;
 
@@ -15,5 +18,55 @@ internal sealed class GuestService : IGuestService
         _repository = repository;
         _logger = logger;
         _mapper = mapper;
+    }
+
+    public async Task<IEnumerable<GuestDto>> GetAllGuestsAsync(bool trackChanges)
+    {
+        var guests = await _repository.Guest.GetAllGuestsAsync(trackChanges);
+
+        return _mapper.Map<IEnumerable<GuestDto>>(guests);
+    }
+
+    public async Task<GuestDto> GetGuestAsync(Guid guestId, bool trackChanges)
+    {
+        var guest = await GetGuestAndCheckIfItExists(guestId, trackChanges);
+
+        return _mapper.Map<GuestDto>(guest);
+    }
+
+    public async Task<GuestDto> CreateGuestAsync(GuestForCreationDto guestForCreation)
+    {
+        var guest = _mapper.Map<Guest>(guestForCreation);
+        guest.CreatedAt = DateTime.UtcNow;
+
+        _repository.Guest.CreateGuest(guest);
+        await _repository.SaveAsync();
+
+        return _mapper.Map<GuestDto>(guest);
+    }
+
+    public async Task UpdateGuestAsync(Guid guestId, GuestForUpdateDto guestForUpdate, bool trackChanges)
+    {
+        var guest = await GetGuestAndCheckIfItExists(guestId, trackChanges);
+
+        _mapper.Map(guestForUpdate, guest);
+        await _repository.SaveAsync();
+    }
+
+    public async Task DeleteGuestAsync(Guid guestId, bool trackChanges)
+    {
+        var guest = await GetGuestAndCheckIfItExists(guestId, trackChanges);
+
+        _repository.Guest.DeleteGuest(guest);
+        await _repository.SaveAsync();
+    }
+
+    private async Task<Guest> GetGuestAndCheckIfItExists(Guid guestId, bool trackChanges)
+    {
+        var guest = await _repository.Guest.GetGuestAsync(guestId, trackChanges);
+        if (guest is null)
+            throw new GuestNotFoundException(guestId);
+
+        return guest;
     }
 }

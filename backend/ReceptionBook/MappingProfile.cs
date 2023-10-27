@@ -11,5 +11,9 @@ public class MappingProfile : Profile
         CreateMap<Room, RoomDto>();
         CreateMap<RoomForCreationDto, Room>();
         CreateMap<RoomForUpdateDto, Room>();
+
+        CreateMap<Guest, GuestDto>();
+        CreateMap<GuestForCreationDto, Guest>();
+        CreateMap<GuestForUpdateDto, Guest>();
     }
 }
