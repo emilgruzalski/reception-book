@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ReceptionBook.Presentation.ActionFilters;
 using Service.Contracts;
 using Shared.DataTransferObjects;
 
@@ -29,22 +30,18 @@ public class RoomsController : ControllerBase
     }
 
     [HttpPost]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateRoom([FromBody] RoomForCreationDto room)
     {
-        if (room is null)
-            return BadRequest("RoomForCreationDto object is null");
-
         var createdRoom = await _service.RoomService.CreateRoomAsync(room);
 
         return CreatedAtRoute("RoomById", new { id = createdRoom.Id }, createdRoom);
     }
 
     [HttpPut("{id:guid}")]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> UpdateRoom(Guid id, [FromBody] RoomForUpdateDto room)
     {
-        if (room is null)
-            return BadRequest("RoomForUpdateDto object is null");
-
         await _service.RoomService.UpdateRoomAsync(id, room, trackChanges: true);
 
         return NoContent();
