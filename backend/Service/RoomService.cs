@@ -36,6 +36,8 @@ internal sealed class RoomService : IRoomService
 
     public async Task<RoomDto> CreateRoomAsync(RoomForCreationDto roomForCreation)
     {
+        await CheckIfRoomNumberIsAvailable(roomForCreation.Number!);
+
         var room = _mapper.Map<Room>(roomForCreation);
         room.Status = RoomStatus.Available;
 
@@ -48,6 +50,7 @@ internal sealed class RoomService : IRoomService
     public async Task UpdateRoomAsync(Guid roomId, RoomForUpdateDto roomForUpdate, bool trackChanges)
     {
         var room = await GetRoomAndCheckIfItExists(roomId, trackChanges);
+        await CheckIfRoomNumberIsAvailable(roomForUpdate.Number!, roomId);
 
         _mapper.Map(roomForUpdate, room);
         await _repository.SaveAsync();
@@ -68,5 +71,11 @@ internal sealed class RoomService : IRoomService
             throw new RoomNotFoundException(roomId);
 
         return room;
+    }
+
+    private async Task CheckIfRoomNumberIsAvailable(string number, Guid? roomId = null)
+    {
+        if (await _repository.Room.RoomNumberExistsAsync(number, roomId))
+            throw new RoomNumberAlreadyExistsBadRequestException(number);
     }
 }
