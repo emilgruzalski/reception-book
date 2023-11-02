@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { finalize } from 'rxjs';
 
 import { Room } from 'src/app/core/models/room.model';
 import { RoomService } from 'src/app/core/services/room.service';
+import { RoomFormDialogComponent, RoomFormDialogData } from '../room-form-dialog/room-form-dialog.component';
 
 @Component({
   selector: 'app-room-list',
@@ -10,12 +12,15 @@ import { RoomService } from 'src/app/core/services/room.service';
   styleUrls: ['./room-list.component.scss']
 })
 export class RoomListComponent implements OnInit {
-  readonly displayedColumns = ['number', 'floor', 'type', 'capacity', 'pricePerNight', 'status'];
+  readonly displayedColumns = ['number', 'floor', 'type', 'capacity', 'pricePerNight', 'status', 'actions'];
 
   rooms: Room[] = [];
   isLoading = false;
 
-  constructor(private roomService: RoomService) { }
+  constructor(
+    private roomService: RoomService,
+    private dialog: MatDialog
+  ) { }
 
   ngOnInit(): void {
     this.loadRooms();
@@ -26,5 +31,16 @@ export class RoomListComponent implements OnInit {
     this.roomService.getRooms()
       .pipe(finalize(() => this.isLoading = false))
       .subscribe(rooms => this.rooms = rooms);
+  }
+
+  openRoomDialog(room?: Room): void {
+    this.dialog.open<RoomFormDialogComponent, RoomFormDialogData, boolean>(RoomFormDialogComponent, {
+      width: '600px',
+      data: { room }
+    }).afterClosed().subscribe(saved => {
+      if (saved) {
+        this.loadRooms();
+      }
+    });
   }
 }

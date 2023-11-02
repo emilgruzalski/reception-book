@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 
 import { MaterialModule } from './material.module';
@@ -13,11 +14,13 @@ import { RoomTypePipe } from './pipes/room-type.pipe';
   ],
   imports: [
     CommonModule,
+    ReactiveFormsModule,
     RouterModule,
     MaterialModule
   ],
   exports: [
     CommonModule,
+    ReactiveFormsModule,
     RouterModule,
     MaterialModule,
     RoomStatusPipe,
