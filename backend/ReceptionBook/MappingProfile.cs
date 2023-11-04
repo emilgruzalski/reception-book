@@ -15,5 +15,11 @@ public class MappingProfile : Profile
         CreateMap<Guest, GuestDto>();
         CreateMap<GuestForCreationDto, Guest>();
         CreateMap<GuestForUpdateDto, Guest>();
+
+        CreateMap<Reservation, ReservationDto>()
+            .ForMember(r => r.RoomNumber, opt => opt.MapFrom(x => x.Room!.Number))
+            .ForMember(r => r.GuestFullName, opt => opt.MapFrom(x => $"{x.Guest!.FirstName} {x.Guest.LastName}"));
+        CreateMap<ReservationForCreationDto, Reservation>();
+        CreateMap<ReservationForUpdateDto, Reservation>();
     }
 }
