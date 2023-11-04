@@ -36,10 +36,13 @@ internal sealed class ReservationService : IReservationService
 
     public async Task<ReservationDto> CreateReservationAsync(ReservationForCreationDto reservationForCreation)
     {
-        await GetRoomAndCheckIfItExists(reservationForCreation.RoomId!.Value);
+        var room = await GetRoomAndCheckIfItExists(reservationForCreation.RoomId!.Value);
         await CheckIfGuestExists(reservationForCreation.GuestId!.Value);
+        await ValidateReservation(room, reservationForCreation);
 
         var reservation = _mapper.Map<Reservation>(reservationForCreation);
+        reservation.CheckInDate = reservation.CheckInDate.Date;
+        reservation.CheckOutDate = reservation.CheckOutDate.Date;
         reservation.Status = ReservationStatus.Confirmed;
         reservation.CreatedAt = DateTime.UtcNow;
 
@@ -53,10 +56,13 @@ internal sealed class ReservationService : IReservationService
         bool trackChanges)
     {
         var reservation = await GetReservationAndCheckIfItExists(reservationId, trackChanges);
-        await GetRoomAndCheckIfItExists(reservationForUpdate.RoomId!.Value);
+        var room = await GetRoomAndCheckIfItExists(reservationForUpdate.RoomId!.Value);
         await CheckIfGuestExists(reservationForUpdate.GuestId!.Value);
+        await ValidateReservation(room, reservationForUpdate);
 
         _mapper.Map(reservationForUpdate, reservation);
+        reservation.CheckInDate = reservation.CheckInDate.Date;
+        reservation.CheckOutDate = reservation.CheckOutDate.Date;
         await _repository.SaveAsync();
     }
 
@@ -66,6 +72,21 @@ internal sealed class ReservationService : IReservationService
 
         _repository.Reservation.DeleteReservation(reservation);
         await _repository.SaveAsync();
+    }
+
+    private async Task ValidateReservation(Room room, ReservationForManipulationDto reservation)
+    {
+        var checkInDate = reservation.CheckInDate!.Value.Date;
+        var checkOutDate = reservation.CheckOutDate!.Value.Date;
+
+        if (checkOutDate <= checkInDate)
+            throw new ReservationDatesBadRequestException();
+
+        if (reservation.NumberOfGuests > room.Capacity)
+            throw new RoomCapacityExceededBadRequestException(room.Number!, room.Capacity);
+
+        if (await _repository.Reservation.HasOverlappingReservationAsync(room.Id, checkInDate, checkOutDate))
+            throw new RoomNotAvailableBadRequestException(room.Number!);
     }
 
     private async Task<Reservation> GetReservationAndCheckIfItExists(Guid reservationId, bool trackChanges)
