@@ -43,6 +43,7 @@ internal sealed class ReservationService : IReservationService
         var reservation = _mapper.Map<Reservation>(reservationForCreation);
         reservation.CheckInDate = reservation.CheckInDate.Date;
         reservation.CheckOutDate = reservation.CheckOutDate.Date;
+        reservation.TotalPrice = CalculateTotalPrice(room, reservation.CheckInDate, reservation.CheckOutDate);
         reservation.Status = ReservationStatus.Confirmed;
         reservation.CreatedAt = DateTime.UtcNow;
 
@@ -63,6 +64,7 @@ internal sealed class ReservationService : IReservationService
         _mapper.Map(reservationForUpdate, reservation);
         reservation.CheckInDate = reservation.CheckInDate.Date;
         reservation.CheckOutDate = reservation.CheckOutDate.Date;
+        reservation.TotalPrice = CalculateTotalPrice(room, reservation.CheckInDate, reservation.CheckOutDate);
         await _repository.SaveAsync();
     }
 
@@ -87,6 +89,13 @@ internal sealed class ReservationService : IReservationService
 
         if (await _repository.Reservation.HasOverlappingReservationAsync(room.Id, checkInDate, checkOutDate))
             throw new RoomNotAvailableBadRequestException(room.Number!);
+    }
+
+    private static decimal CalculateTotalPrice(Room room, DateTime checkInDate, DateTime checkOutDate)
+    {
+        var nights = (checkOutDate.Date - checkInDate.Date).Days;
+
+        return nights * room.PricePerNight;
     }
 
     private async Task<Reservation> GetReservationAndCheckIfItExists(Guid reservationId, bool trackChanges)
