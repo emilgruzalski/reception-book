@@ -57,6 +57,9 @@ internal sealed class GuestService : IGuestService
     {
         var guest = await GetGuestAndCheckIfItExists(guestId, trackChanges);
 
+        if (await _repository.Reservation.AnyForGuestAsync(guestId))
+            throw new GuestHasReservationsBadRequestException(guestId);
+
         _repository.Guest.DeleteGuest(guest);
         await _repository.SaveAsync();
     }

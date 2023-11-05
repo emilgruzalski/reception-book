@@ -34,6 +34,12 @@ public class ReservationRepository : RepositoryBase<Reservation>, IReservationRe
                 trackChanges: false)
             .AnyAsync();
 
+    public async Task<bool> AnyForRoomAsync(Guid roomId) =>
+        await FindByCondition(r => r.RoomId.Equals(roomId), trackChanges: false).AnyAsync();
+
+    public async Task<bool> AnyForGuestAsync(Guid guestId) =>
+        await FindByCondition(r => r.GuestId.Equals(guestId), trackChanges: false).AnyAsync();
+
     public void CreateReservation(Reservation reservation) => Create(reservation);
 
     public void DeleteReservation(Reservation reservation) => Delete(reservation);

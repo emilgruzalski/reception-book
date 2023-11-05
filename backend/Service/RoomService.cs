@@ -60,6 +60,9 @@ internal sealed class RoomService : IRoomService
     {
         var room = await GetRoomAndCheckIfItExists(roomId, trackChanges);
 
+        if (await _repository.Reservation.AnyForRoomAsync(roomId))
+            throw new RoomHasReservationsBadRequestException(roomId);
+
         _repository.Room.DeleteRoom(room);
         await _repository.SaveAsync();
     }
