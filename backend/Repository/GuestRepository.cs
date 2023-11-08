@@ -1,6 +1,7 @@
 using Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.RequestFeatures;
 
 namespace Repository;
 
@@ -11,11 +12,11 @@ public class GuestRepository : RepositoryBase<Guest>, IGuestRepository
     {
     }
 
-    public async Task<IEnumerable<Guest>> GetAllGuestsAsync(bool trackChanges) =>
+    public async Task<PagedList<Guest>> GetAllGuestsAsync(GuestParameters guestParameters, bool trackChanges) =>
         await FindAll(trackChanges)
             .OrderBy(g => g.LastName)
             .ThenBy(g => g.FirstName)
-            .ToListAsync();
+            .ToPagedListAsync(guestParameters);
 
     public async Task<Guest?> GetGuestAsync(Guid guestId, bool trackChanges) =>
         await FindByCondition(g => g.Id.Equals(guestId), trackChanges)

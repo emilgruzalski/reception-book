@@ -1,10 +1,11 @@
 using Entities.Models;
+using Shared.RequestFeatures;
 
 namespace Contracts;
 
 public interface IReservationRepository
 {
-    Task<IEnumerable<Reservation>> GetAllReservationsAsync(bool trackChanges);
+    Task<PagedList<Reservation>> GetAllReservationsAsync(ReservationParameters reservationParameters, bool trackChanges);
     Task<Reservation?> GetReservationAsync(Guid reservationId, bool trackChanges);
     Task<bool> HasOverlappingReservationAsync(Guid roomId, DateTime checkInDate, DateTime checkOutDate);
     Task<bool> AnyForRoomAsync(Guid roomId);

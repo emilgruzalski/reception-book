@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using ReceptionBook.Presentation.ActionFilters;
 using Service.Contracts;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
+using System.Text.Json;
 
 namespace ReceptionBook.Presentation.Controllers;
 
@@ -14,11 +16,13 @@ public class ReservationsController : ControllerBase
     public ReservationsController(IServiceManager service) => _service = service;
 
     [HttpGet]
-    public async Task<IActionResult> GetReservations()
+    public async Task<IActionResult> GetReservations([FromQuery] ReservationParameters reservationParameters)
     {
-        var reservations = await _service.ReservationService.GetAllReservationsAsync(trackChanges: false);
+        var pagedResult = await _service.ReservationService.GetAllReservationsAsync(reservationParameters, trackChanges: false);
 
-        return Ok(reservations);
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+
+        return Ok(pagedResult.reservations);
     }
 
     [HttpGet("{id:guid}", Name = "ReservationById")]

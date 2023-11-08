@@ -4,6 +4,7 @@ using Entities.Exceptions;
 using Entities.Models;
 using Service.Contracts;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
 
 namespace Service;
 
@@ -20,11 +21,14 @@ internal sealed class RoomService : IRoomService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<RoomDto>> GetAllRoomsAsync(bool trackChanges)
+    public async Task<(IEnumerable<RoomDto> rooms, MetaData metaData)> GetAllRoomsAsync(
+        RoomParameters roomParameters, bool trackChanges)
     {
-        var rooms = await _repository.Room.GetAllRoomsAsync(trackChanges);
+        var roomsWithMetaData = await _repository.Room.GetAllRoomsAsync(roomParameters, trackChanges);
 
-        return _mapper.Map<IEnumerable<RoomDto>>(rooms);
+        var roomsDto = _mapper.Map<IEnumerable<RoomDto>>(roomsWithMetaData);
+
+        return (rooms: roomsDto, metaData: roomsWithMetaData.MetaData);
     }
 
     public async Task<RoomDto> GetRoomAsync(Guid roomId, bool trackChanges)

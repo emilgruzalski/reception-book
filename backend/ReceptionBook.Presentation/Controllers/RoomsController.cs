@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using ReceptionBook.Presentation.ActionFilters;
 using Service.Contracts;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
+using System.Text.Json;
 
 namespace ReceptionBook.Presentation.Controllers;
 
@@ -14,11 +16,13 @@ public class RoomsController : ControllerBase
     public RoomsController(IServiceManager service) => _service = service;
 
     [HttpGet]
-    public async Task<IActionResult> GetRooms()
+    public async Task<IActionResult> GetRooms([FromQuery] RoomParameters roomParameters)
     {
-        var rooms = await _service.RoomService.GetAllRoomsAsync(trackChanges: false);
+        var pagedResult = await _service.RoomService.GetAllRoomsAsync(roomParameters, trackChanges: false);
 
-        return Ok(rooms);
+        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+
+        return Ok(pagedResult.rooms);
     }
 
     [HttpGet("{id:guid}", Name = "RoomById")]

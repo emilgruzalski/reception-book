@@ -4,6 +4,7 @@ using Entities.Exceptions;
 using Entities.Models;
 using Service.Contracts;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
 
 namespace Service;
 
@@ -20,11 +21,14 @@ internal sealed class GuestService : IGuestService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<GuestDto>> GetAllGuestsAsync(bool trackChanges)
+    public async Task<(IEnumerable<GuestDto> guests, MetaData metaData)> GetAllGuestsAsync(
+        GuestParameters guestParameters, bool trackChanges)
     {
-        var guests = await _repository.Guest.GetAllGuestsAsync(trackChanges);
+        var guestsWithMetaData = await _repository.Guest.GetAllGuestsAsync(guestParameters, trackChanges);
 
-        return _mapper.Map<IEnumerable<GuestDto>>(guests);
+        var guestsDto = _mapper.Map<IEnumerable<GuestDto>>(guestsWithMetaData);
+
+        return (guests: guestsDto, metaData: guestsWithMetaData.MetaData);
     }
 
     public async Task<GuestDto> GetGuestAsync(Guid guestId, bool trackChanges)

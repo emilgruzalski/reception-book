@@ -1,6 +1,7 @@
 using Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Shared.RequestFeatures;
 
 namespace Repository;
 
@@ -11,10 +12,10 @@ public class RoomRepository : RepositoryBase<Room>, IRoomRepository
     {
     }
 
-    public async Task<IEnumerable<Room>> GetAllRoomsAsync(bool trackChanges) =>
+    public async Task<PagedList<Room>> GetAllRoomsAsync(RoomParameters roomParameters, bool trackChanges) =>
         await FindAll(trackChanges)
             .OrderBy(r => r.Number)
-            .ToListAsync();
+            .ToPagedListAsync(roomParameters);
 
     public async Task<Room?> GetRoomAsync(Guid roomId, bool trackChanges) =>
         await FindByCondition(r => r.Id.Equals(roomId), trackChanges)
