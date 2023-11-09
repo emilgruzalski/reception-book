@@ -5,14 +5,12 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { SharedModule } from './shared/shared.module';
-import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { LayoutModule } from './layout/layout.module';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    MainLayoutComponent,
     DashboardComponent
   ],
   imports: [
@@ -20,7 +18,7 @@ import { DashboardComponent } from './features/dashboard/dashboard.component';
     BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
-    SharedModule
+    LayoutModule
   ],
   providers: [],
   bootstrap: [AppComponent]
