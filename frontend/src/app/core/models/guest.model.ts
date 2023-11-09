@@ -17,3 +17,10 @@ export interface GuestForManipulation {
   documentNumber: string;
   address?: string;
 }
+
+export interface GuestQuery {
+  pageNumber: number;
+  pageSize: number;
+  orderBy?: string;
+  searchTerm?: string;
+}

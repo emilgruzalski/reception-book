@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
-import { Guest, GuestForManipulation } from '../models/guest.model';
+import { Guest, GuestForManipulation, GuestQuery } from '../models/guest.model';
+import { PagedResult } from '../models/paged-result.model';
+import { toHttpParams, toPagedResult } from '../utils/http.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +15,9 @@ export class GuestService {
 
   constructor(private http: HttpClient) { }
 
-  getGuests(): Observable<Guest[]> {
-    return this.http.get<Guest[]>(this.url);
+  getGuests(query: GuestQuery): Observable<PagedResult<Guest>> {
+    return this.http.get<Guest[]>(this.url, { params: toHttpParams(query), observe: 'response' })
+      .pipe(map(response => toPagedResult(response)));
   }
 
   getGuest(id: string): Observable<Guest> {

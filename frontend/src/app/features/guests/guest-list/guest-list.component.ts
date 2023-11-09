@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormControl } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { filter, finalize, switchMap } from 'rxjs';
+import { PageEvent } from '@angular/material/paginator';
+import { debounceTime, distinctUntilChanged, filter, finalize, switchMap } from 'rxjs';
 
-import { Guest } from 'src/app/core/models/guest.model';
+import { Guest, GuestQuery } from 'src/app/core/models/guest.model';
+import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from 'src/app/core/models/paged-result.model';
 import { GuestService } from 'src/app/core/services/guest.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 import { GuestFormDialogComponent, GuestFormDialogData } from '../guest-form-dialog/guest-form-dialog.component';
+
+const SEARCH_DEBOUNCE_MS = 400;
 
 @Component({
   selector: 'app-guest-list',
@@ -14,13 +20,27 @@ import { GuestFormDialogComponent, GuestFormDialogData } from '../guest-form-dia
 export class GuestListComponent implements OnInit {
   readonly displayedColumns = ['name', 'documentNumber', 'email', 'phoneNumber', 'createdAt', 'actions'];
 
+  readonly pageSizeOptions = PAGE_SIZE_OPTIONS;
+  readonly searchControl = new FormControl('', { nonNullable: true });
+
   guests: Guest[] = [];
+  totalCount = 0;
+  query: GuestQuery = { pageNumber: 1, pageSize: DEFAULT_PAGE_SIZE };
   isLoading = false;
 
   constructor(
     private guestService: GuestService,
     private dialog: MatDialog
-  ) { }
+  ) {
+    this.searchControl.valueChanges.pipe(
+      debounceTime(SEARCH_DEBOUNCE_MS),
+      distinctUntilChanged(),
+      takeUntilDestroyed()
+    ).subscribe(searchTerm => {
+      this.query = { ...this.query, searchTerm };
+      this.loadGuests();
+    });
+  }
 
   ngOnInit(): void {
     this.loadGuests();
@@ -28,9 +48,17 @@ export class GuestListComponent implements OnInit {
 
   loadGuests(): void {
     this.isLoading = true;
-    this.guestService.getGuests()
+    this.guestService.getGuests(this.query)
       .pipe(finalize(() => this.isLoading = false))
-      .subscribe(guests => this.guests = guests);
+      .subscribe(result => {
+        this.guests = result.items;
+        this.totalCount = result.pagination.totalCount;
+      });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.query = { ...this.query, pageNumber: event.pageIndex + 1, pageSize: event.pageSize };
+    this.loadGuests();
   }
 
   openGuestDialog(guest?: Guest): void {

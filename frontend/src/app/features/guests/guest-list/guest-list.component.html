@@ -6,6 +6,14 @@
   </button>
 </div>
 
+<div class="filters">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Szukaj gościa</mat-label>
+    <input matInput [formControl]="searchControl" placeholder="Nazwisko, dokument, e-mail lub telefon">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+</div>
+
 <div class="table-container mat-elevation-z2">
   <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
 
@@ -54,4 +62,12 @@
       <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">Brak gości do wyświetlenia.</td>
     </tr>
   </table>
+
+  <mat-paginator
+    [length]="totalCount"
+    [pageIndex]="query.pageNumber - 1"
+    [pageSize]="query.pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="onPageChange($event)">
+  </mat-paginator>
 </div>
