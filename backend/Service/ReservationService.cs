@@ -24,6 +24,9 @@ internal sealed class ReservationService : IReservationService
     public async Task<(IEnumerable<ReservationDto> reservations, MetaData metaData)> GetAllReservationsAsync(
         ReservationParameters reservationParameters, bool trackChanges)
     {
+        if (!reservationParameters.ValidDateRange)
+            throw new DateRangeBadRequestException();
+
         var reservationsWithMetaData = await _repository.Reservation.GetAllReservationsAsync(reservationParameters, trackChanges);
 
         var reservationsDto = _mapper.Map<IEnumerable<ReservationDto>>(reservationsWithMetaData);

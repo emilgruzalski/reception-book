@@ -24,6 +24,9 @@ internal sealed class RoomService : IRoomService
     public async Task<(IEnumerable<RoomDto> rooms, MetaData metaData)> GetAllRoomsAsync(
         RoomParameters roomParameters, bool trackChanges)
     {
+        if (!roomParameters.ValidPriceRange)
+            throw new MaxPriceRangeBadRequestException();
+
         var roomsWithMetaData = await _repository.Room.GetAllRoomsAsync(roomParameters, trackChanges);
 
         var roomsDto = _mapper.Map<IEnumerable<RoomDto>>(roomsWithMetaData);

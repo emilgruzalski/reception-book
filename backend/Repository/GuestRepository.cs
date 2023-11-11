@@ -1,6 +1,7 @@
 using Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Repository.Extensions;
 using Shared.RequestFeatures;
 
 namespace Repository;
@@ -14,6 +15,7 @@ public class GuestRepository : RepositoryBase<Guest>, IGuestRepository
 
     public async Task<PagedList<Guest>> GetAllGuestsAsync(GuestParameters guestParameters, bool trackChanges) =>
         await FindAll(trackChanges)
+            .Search(guestParameters.SearchTerm)
             .OrderBy(g => g.LastName)
             .ThenBy(g => g.FirstName)
             .ToPagedListAsync(guestParameters);

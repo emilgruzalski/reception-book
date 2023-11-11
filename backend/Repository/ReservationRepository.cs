@@ -1,6 +1,7 @@
 using Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Repository.Extensions;
 using Shared.RequestFeatures;
 
 namespace Repository;
@@ -14,6 +15,8 @@ public class ReservationRepository : RepositoryBase<Reservation>, IReservationRe
 
     public async Task<PagedList<Reservation>> GetAllReservationsAsync(ReservationParameters reservationParameters, bool trackChanges) =>
         await FindAll(trackChanges)
+            .FilterReservations(reservationParameters)
+            .Search(reservationParameters.SearchTerm)
             .Include(r => r.Room)
             .Include(r => r.Guest)
             .OrderByDescending(r => r.CheckInDate)

@@ -1,6 +1,7 @@
 using Contracts;
 using Entities.Models;
 using Microsoft.EntityFrameworkCore;
+using Repository.Extensions;
 using Shared.RequestFeatures;
 
 namespace Repository;
@@ -14,6 +15,8 @@ public class RoomRepository : RepositoryBase<Room>, IRoomRepository
 
     public async Task<PagedList<Room>> GetAllRoomsAsync(RoomParameters roomParameters, bool trackChanges) =>
         await FindAll(trackChanges)
+            .FilterRooms(roomParameters)
+            .Search(roomParameters.SearchTerm)
             .OrderBy(r => r.Number)
             .ToPagedListAsync(roomParameters);
 
