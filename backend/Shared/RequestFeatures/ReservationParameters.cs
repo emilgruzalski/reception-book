@@ -4,6 +4,8 @@ namespace Shared.RequestFeatures;
 
 public class ReservationParameters : RequestParameters
 {
+    public ReservationParameters() => OrderBy = "checkInDate desc";
+
     public ReservationStatus? Status { get; set; }
     public DateTime? FromDate { get; set; }
     public DateTime? ToDate { get; set; }

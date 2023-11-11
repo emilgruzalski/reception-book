@@ -4,6 +4,8 @@ namespace Shared.RequestFeatures;
 
 public class RoomParameters : RequestParameters
 {
+    public RoomParameters() => OrderBy = "number";
+
     public RoomType? Type { get; set; }
     public RoomStatus? Status { get; set; }
     public decimal? MinPrice { get; set; }

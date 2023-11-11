@@ -17,7 +17,7 @@ public class RoomRepository : RepositoryBase<Room>, IRoomRepository
         await FindAll(trackChanges)
             .FilterRooms(roomParameters)
             .Search(roomParameters.SearchTerm)
-            .OrderBy(r => r.Number)
+            .Sort(roomParameters.OrderBy)
             .ToPagedListAsync(roomParameters);
 
     public async Task<Room?> GetRoomAsync(Guid roomId, bool trackChanges) =>

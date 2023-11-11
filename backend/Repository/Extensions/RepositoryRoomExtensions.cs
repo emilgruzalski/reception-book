@@ -1,4 +1,6 @@
+using System.Linq.Dynamic.Core;
 using Entities.Models;
+using Repository.Extensions.Utility;
 using Shared.RequestFeatures;
 
 namespace Repository.Extensions;
@@ -23,5 +25,18 @@ public static class RepositoryRoomExtensions
         return rooms.Where(r =>
             r.Number!.ToLower().Contains(lowerCaseTerm) ||
             (r.Description != null && r.Description.ToLower().Contains(lowerCaseTerm)));
+    }
+
+    public static IQueryable<Room> Sort(this IQueryable<Room> rooms, string? orderByQueryString)
+    {
+        if (string.IsNullOrWhiteSpace(orderByQueryString))
+            return rooms.OrderBy(r => r.Number);
+
+        var orderQuery = OrderQueryBuilder.CreateOrderQuery<Room>(orderByQueryString);
+
+        if (string.IsNullOrWhiteSpace(orderQuery))
+            return rooms.OrderBy(r => r.Number);
+
+        return rooms.OrderBy(orderQuery);
     }
 }

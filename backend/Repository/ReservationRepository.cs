@@ -19,7 +19,7 @@ public class ReservationRepository : RepositoryBase<Reservation>, IReservationRe
             .Search(reservationParameters.SearchTerm)
             .Include(r => r.Room)
             .Include(r => r.Guest)
-            .OrderByDescending(r => r.CheckInDate)
+            .Sort(reservationParameters.OrderBy)
             .ToPagedListAsync(reservationParameters);
 
     public async Task<Reservation?> GetReservationAsync(Guid reservationId, bool trackChanges) =>

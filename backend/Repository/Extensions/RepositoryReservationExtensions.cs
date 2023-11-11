@@ -1,4 +1,6 @@
+using System.Linq.Dynamic.Core;
 using Entities.Models;
+using Repository.Extensions.Utility;
 using Shared.RequestFeatures;
 
 namespace Repository.Extensions;
@@ -25,5 +27,18 @@ public static class RepositoryReservationExtensions
             r.Room!.Number!.ToLower().Contains(lowerCaseTerm) ||
             r.Guest!.LastName!.ToLower().Contains(lowerCaseTerm) ||
             r.Guest.FirstName!.ToLower().Contains(lowerCaseTerm));
+    }
+
+    public static IQueryable<Reservation> Sort(this IQueryable<Reservation> reservations, string? orderByQueryString)
+    {
+        if (string.IsNullOrWhiteSpace(orderByQueryString))
+            return reservations.OrderByDescending(r => r.CheckInDate);
+
+        var orderQuery = OrderQueryBuilder.CreateOrderQuery<Reservation>(orderByQueryString);
+
+        if (string.IsNullOrWhiteSpace(orderQuery))
+            return reservations.OrderByDescending(r => r.CheckInDate);
+
+        return reservations.OrderBy(orderQuery);
     }
 }

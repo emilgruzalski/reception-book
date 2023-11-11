@@ -19,4 +19,6 @@ public abstract class RequestParameters
         get => _pageSize;
         set => _pageSize = value < 1 ? DefaultPageSize : Math.Min(value, MaxPageSize);
     }
+
+    public string? OrderBy { get; set; }
 }

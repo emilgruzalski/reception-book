@@ -16,8 +16,7 @@ public class GuestRepository : RepositoryBase<Guest>, IGuestRepository
     public async Task<PagedList<Guest>> GetAllGuestsAsync(GuestParameters guestParameters, bool trackChanges) =>
         await FindAll(trackChanges)
             .Search(guestParameters.SearchTerm)
-            .OrderBy(g => g.LastName)
-            .ThenBy(g => g.FirstName)
+            .Sort(guestParameters.OrderBy)
             .ToPagedListAsync(guestParameters);
 
     public async Task<Guest?> GetGuestAsync(Guid guestId, bool trackChanges) =>

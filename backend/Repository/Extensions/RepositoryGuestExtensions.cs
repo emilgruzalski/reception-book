@@ -1,4 +1,6 @@
+using System.Linq.Dynamic.Core;
 using Entities.Models;
+using Repository.Extensions.Utility;
 
 namespace Repository.Extensions;
 
@@ -17,5 +19,18 @@ public static class RepositoryGuestExtensions
             g.DocumentNumber!.ToLower().Contains(lowerCaseTerm) ||
             (g.Email != null && g.Email.ToLower().Contains(lowerCaseTerm)) ||
             (g.PhoneNumber != null && g.PhoneNumber.Contains(lowerCaseTerm)));
+    }
+
+    public static IQueryable<Guest> Sort(this IQueryable<Guest> guests, string? orderByQueryString)
+    {
+        if (string.IsNullOrWhiteSpace(orderByQueryString))
+            return guests.OrderBy(g => g.LastName).ThenBy(g => g.FirstName);
+
+        var orderQuery = OrderQueryBuilder.CreateOrderQuery<Guest>(orderByQueryString);
+
+        if (string.IsNullOrWhiteSpace(orderQuery))
+            return guests.OrderBy(g => g.LastName).ThenBy(g => g.FirstName);
+
+        return guests.OrderBy(orderQuery);
     }
 }
