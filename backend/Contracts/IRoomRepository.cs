@@ -7,6 +7,8 @@ public interface IRoomRepository
 {
     Task<PagedList<Room>> GetAllRoomsAsync(RoomParameters roomParameters, bool trackChanges);
     Task<Room?> GetRoomAsync(Guid roomId, bool trackChanges);
+    Task<IEnumerable<Room>> GetAvailableRoomsAsync(DateTime checkInDate, DateTime checkOutDate, int numberOfGuests,
+        bool trackChanges);
     Task<bool> RoomNumberExistsAsync(string number, Guid? excludedRoomId = null);
     void CreateRoom(Room room);
     void DeleteRoom(Room room);

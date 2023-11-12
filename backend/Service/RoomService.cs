@@ -41,6 +41,21 @@ internal sealed class RoomService : IRoomService
         return _mapper.Map<RoomDto>(room);
     }
 
+    public async Task<IEnumerable<RoomDto>> GetAvailableRoomsAsync(RoomAvailabilityParameters parameters,
+        bool trackChanges)
+    {
+        var checkInDate = parameters.CheckInDate!.Value.Date;
+        var checkOutDate = parameters.CheckOutDate!.Value.Date;
+
+        if (checkOutDate <= checkInDate)
+            throw new ReservationDatesBadRequestException();
+
+        var rooms = await _repository.Room.GetAvailableRoomsAsync(checkInDate, checkOutDate,
+            parameters.NumberOfGuests, trackChanges);
+
+        return _mapper.Map<IEnumerable<RoomDto>>(rooms);
+    }
+
     public async Task<RoomDto> CreateRoomAsync(RoomForCreationDto roomForCreation)
     {
         await CheckIfRoomNumberIsAvailable(roomForCreation.Number!);

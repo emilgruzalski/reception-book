@@ -25,6 +25,17 @@ public class RoomsController : ControllerBase
         return Ok(pagedResult.rooms);
     }
 
+    [HttpGet("available")]
+    public async Task<IActionResult> GetAvailableRooms([FromQuery] RoomAvailabilityParameters parameters)
+    {
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+
+        var rooms = await _service.RoomService.GetAvailableRoomsAsync(parameters, trackChanges: false);
+
+        return Ok(rooms);
+    }
+
     [HttpGet("{id:guid}", Name = "RoomById")]
     public async Task<IActionResult> GetRoom(Guid id)
     {
