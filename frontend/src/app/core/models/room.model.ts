@@ -26,3 +26,12 @@ export interface RoomForManipulation {
   description?: string;
   status?: RoomStatus;
 }
+
+export interface RoomQuery {
+  pageNumber: number;
+  pageSize: number;
+  orderBy?: string;
+  searchTerm?: string;
+  type?: RoomType;
+  status?: RoomStatus;
+}

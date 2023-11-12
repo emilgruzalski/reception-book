@@ -5,13 +5,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { PageEvent } from '@angular/material/paginator';
 import { debounceTime, distinctUntilChanged, filter, finalize, switchMap } from 'rxjs';
 
+import { SEARCH_DEBOUNCE_MS } from 'src/app/core/constants';
 import { Guest, GuestQuery } from 'src/app/core/models/guest.model';
 import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from 'src/app/core/models/paged-result.model';
 import { GuestService } from 'src/app/core/services/guest.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 import { GuestFormDialogComponent, GuestFormDialogData } from '../guest-form-dialog/guest-form-dialog.component';
-
-const SEARCH_DEBOUNCE_MS = 400;
 
 @Component({
   selector: 'app-guest-list',

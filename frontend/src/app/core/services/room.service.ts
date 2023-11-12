@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
-import { Room, RoomForManipulation } from '../models/room.model';
+import { Room, RoomForManipulation, RoomQuery } from '../models/room.model';
+import { PagedResult } from '../models/paged-result.model';
+import { toHttpParams, toPagedResult } from '../utils/http.utils';
 
 @Injectable({
   providedIn: 'root'
@@ -13,8 +15,9 @@ export class RoomService {
 
   constructor(private http: HttpClient) { }
 
-  getRooms(): Observable<Room[]> {
-    return this.http.get<Room[]>(this.url);
+  getRooms(query: RoomQuery): Observable<PagedResult<Room>> {
+    return this.http.get<Room[]>(this.url, { params: toHttpParams(query), observe: 'response' })
+      .pipe(map(response => toPagedResult(response)));
   }
 
   getRoom(id: string): Observable<Room> {

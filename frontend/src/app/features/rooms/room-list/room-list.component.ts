@@ -1,11 +1,19 @@
 import { Component, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormBuilder } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
-import { filter, finalize, switchMap } from 'rxjs';
+import { PageEvent } from '@angular/material/paginator';
+import { Sort } from '@angular/material/sort';
+import { debounceTime, filter, finalize, switchMap } from 'rxjs';
 
-import { Room } from 'src/app/core/models/room.model';
+import { SEARCH_DEBOUNCE_MS } from 'src/app/core/constants';
+import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from 'src/app/core/models/paged-result.model';
+import { Room, ROOM_STATUSES, ROOM_TYPES, RoomQuery, RoomStatus, RoomType } from 'src/app/core/models/room.model';
 import { RoomService } from 'src/app/core/services/room.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 import { RoomFormDialogComponent, RoomFormDialogData } from '../room-form-dialog/room-form-dialog.component';
+
+const DEFAULT_ORDER_BY = 'number';
 
 @Component({
   selector: 'app-room-list',
@@ -14,14 +22,39 @@ import { RoomFormDialogComponent, RoomFormDialogData } from '../room-form-dialog
 })
 export class RoomListComponent implements OnInit {
   readonly displayedColumns = ['number', 'floor', 'type', 'capacity', 'pricePerNight', 'status', 'actions'];
+  readonly pageSizeOptions = PAGE_SIZE_OPTIONS;
+  readonly roomTypes = ROOM_TYPES;
+  readonly roomStatuses = ROOM_STATUSES;
+
+  readonly filtersForm = this.fb.group({
+    searchTerm: [''],
+    type: [null as RoomType | null],
+    status: [null as RoomStatus | null]
+  });
 
   rooms: Room[] = [];
+  totalCount = 0;
+  query: RoomQuery = { pageNumber: 1, pageSize: DEFAULT_PAGE_SIZE, orderBy: DEFAULT_ORDER_BY };
   isLoading = false;
 
   constructor(
+    private fb: FormBuilder,
     private roomService: RoomService,
     private dialog: MatDialog
-  ) { }
+  ) {
+    this.filtersForm.valueChanges.pipe(
+      debounceTime(SEARCH_DEBOUNCE_MS),
+      takeUntilDestroyed()
+    ).subscribe(filters => {
+      this.query = {
+        ...this.query,
+        searchTerm: filters.searchTerm ?? undefined,
+        type: filters.type ?? undefined,
+        status: filters.status ?? undefined
+      };
+      this.loadRooms();
+    });
+  }
 
   ngOnInit(): void {
     this.loadRooms();
@@ -29,9 +62,23 @@ export class RoomListComponent implements OnInit {
 
   loadRooms(): void {
     this.isLoading = true;
-    this.roomService.getRooms()
+    this.roomService.getRooms(this.query)
       .pipe(finalize(() => this.isLoading = false))
-      .subscribe(rooms => this.rooms = rooms);
+      .subscribe(result => {
+        this.rooms = result.items;
+        this.totalCount = result.pagination.totalCount;
+      });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.query = { ...this.query, pageNumber: event.pageIndex + 1, pageSize: event.pageSize };
+    this.loadRooms();
+  }
+
+  onSortChange(sort: Sort): void {
+    const orderBy = sort.direction ? `${sort.active} ${sort.direction}` : DEFAULT_ORDER_BY;
+    this.query = { ...this.query, orderBy };
+    this.loadRooms();
   }
 
   openRoomDialog(room?: Room): void {

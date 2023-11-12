@@ -9,6 +9,7 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSortModule } from '@angular/material/sort';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -24,6 +25,7 @@ const MATERIAL_MODULES = [
   MatProgressBarModule,
   MatSelectModule,
   MatSidenavModule,
+  MatSortModule,
   MatTableModule,
   MatToolbarModule,
   MatTooltipModule
