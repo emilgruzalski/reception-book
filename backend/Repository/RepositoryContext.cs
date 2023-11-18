@@ -18,6 +18,7 @@ public class RepositoryContext : IdentityDbContext<User>
 
         modelBuilder.ApplyConfiguration(new RoomConfiguration());
         modelBuilder.ApplyConfiguration(new ReservationConfiguration());
+        modelBuilder.ApplyConfiguration(new RoleConfiguration());
     }
 
     public DbSet<Room>? Rooms { get; set; }

@@ -350,6 +350,22 @@ namespace ReceptionBook.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "c7b013f0-5201-4317-abd8-c211f91b7330",
+                            ConcurrencyStamp = "1f3a3c5e-8b8f-4d2a-9a43-6c1e2f0d7b11",
+                            Name = "Administrator",
+                            NormalizedName = "ADMINISTRATOR"
+                        },
+                        new
+                        {
+                            Id = "8e445865-a24d-4543-a6c6-9443d048cdb9",
+                            ConcurrencyStamp = "4b2d9e7a-6c3f-41a8-b5e0-9d8c7f6a5e42",
+                            Name = "Receptionist",
+                            NormalizedName = "RECEPTIONIST"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
