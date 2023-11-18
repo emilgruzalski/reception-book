@@ -21,5 +21,7 @@ public class MappingProfile : Profile
             .ForMember(r => r.GuestFullName, opt => opt.MapFrom(x => $"{x.Guest!.FirstName} {x.Guest.LastName}"));
         CreateMap<ReservationForCreationDto, Reservation>();
         CreateMap<ReservationForUpdateDto, Reservation>();
+
+        CreateMap<UserForRegistrationDto, User>();
     }
 }
