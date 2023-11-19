@@ -20,6 +20,11 @@ export class RoomService {
       .pipe(map(response => toPagedResult(response)));
   }
 
+  getAvailableRooms(checkInDate: string, checkOutDate: string, numberOfGuests: number): Observable<Room[]> {
+    const params = toHttpParams({ checkInDate, checkOutDate, numberOfGuests });
+    return this.http.get<Room[]>(`${this.url}/available`, { params });
+  }
+
   getRoom(id: string): Observable<Room> {
     return this.http.get<Room>(`${this.url}/${id}`);
   }

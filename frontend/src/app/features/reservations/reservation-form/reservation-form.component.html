@@ -1,0 +1,77 @@
+<div class="page-header">
+  <h1>{{ isEditMode ? 'Edycja rezerwacji' : 'Nowa rezerwacja' }}</h1>
+</div>
+
+<form [formGroup]="form" (ngSubmit)="save()" class="reservation-form">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Termin pobytu</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Przyjazd – wyjazd</mat-label>
+        <mat-date-range-input [rangePicker]="stayPicker" [min]="isEditMode ? null : today">
+          <input matStartDate formControlName="checkInDate" placeholder="Przyjazd" required>
+          <input matEndDate formControlName="checkOutDate" placeholder="Wyjazd" required>
+        </mat-date-range-input>
+        <mat-datepicker-toggle matIconSuffix [for]="stayPicker"></mat-datepicker-toggle>
+        <mat-date-range-picker #stayPicker></mat-date-range-picker>
+        <mat-error>Wybierz datę przyjazdu i wyjazdu.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Liczba osób</mat-label>
+        <input matInput type="number" formControlName="numberOfGuests" min="1" [max]="maxGuests" required>
+        <mat-error>Liczba osób musi być od 1 do {{ maxGuests }}.</mat-error>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Pokój i gość</mat-card-title>
+    </mat-card-header>
+    <mat-card-content class="form-grid">
+      <mat-form-field appearance="outline">
+        <mat-label>Pokój</mat-label>
+        <mat-select formControlName="roomId" required>
+          <mat-option *ngFor="let room of availableRooms" [value]="room.id">
+            {{ room.number }} – {{ room.type | roomType }} ({{ room.capacity }} os.), {{ room.pricePerNight | currency:'PLN' }}
+          </mat-option>
+        </mat-select>
+        <mat-hint *ngIf="isLoadingRooms">Wyszukiwanie wolnych pokoi…</mat-hint>
+        <mat-hint *ngIf="!isLoadingRooms && nights > 0 && availableRooms.length === 0">
+          Brak wolnych pokoi w wybranym terminie.
+        </mat-hint>
+        <mat-error>Wybierz pokój.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Gość</mat-label>
+        <input matInput formControlName="guest" [matAutocomplete]="guestAutocomplete"
+               placeholder="Wpisz nazwisko lub numer dokumentu" required>
+        <mat-autocomplete #guestAutocomplete="matAutocomplete" [displayWith]="displayGuest">
+          <mat-option *ngFor="let guest of guestOptions$ | async" [value]="guest">
+            {{ guest.lastName }} {{ guest.firstName }} <small>({{ guest.documentNumber }})</small>
+          </mat-option>
+        </mat-autocomplete>
+        <mat-error>Wybierz gościa z listy.</mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Uwagi</mat-label>
+        <textarea matInput formControlName="notes" rows="3" maxlength="500"></textarea>
+      </mat-form-field>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="summary" *ngIf="selectedRoom && nights > 0">
+    Liczba nocy: <strong>{{ nights }}</strong>,
+    kwota: <strong>{{ estimatedPrice | currency:'PLN' }}</strong>
+  </div>
+
+  <div class="form-actions">
+    <a mat-button routerLink="/reservations">Anuluj</a>
+    <button mat-flat-button color="primary" type="submit" [disabled]="isSaving">Zapisz rezerwację</button>
+  </div>
+</form>
