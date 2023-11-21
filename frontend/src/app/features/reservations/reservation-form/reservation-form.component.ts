@@ -9,6 +9,7 @@ import { Guest } from 'src/app/core/models/guest.model';
 import { ReservationForManipulation } from 'src/app/core/models/reservation.model';
 import { Room } from 'src/app/core/models/room.model';
 import { GuestService } from 'src/app/core/services/guest.service';
+import { fromApiDate, toApiDate } from 'src/app/core/utils/date.utils';
 import { ReservationService } from 'src/app/core/services/reservation.service';
 import { RoomService } from 'src/app/core/services/room.service';
 
@@ -115,8 +116,8 @@ export class ReservationFormComponent implements OnInit {
     const reservation: ReservationForManipulation = {
       roomId: value.roomId!,
       guestId: (value.guest as Guest).id,
-      checkInDate: value.checkInDate!.toISOString(),
-      checkOutDate: value.checkOutDate!.toISOString(),
+      checkInDate: toApiDate(value.checkInDate!),
+      checkOutDate: toApiDate(value.checkOutDate!),
       numberOfGuests: value.numberOfGuests!,
       notes: value.notes || undefined
     };
@@ -139,7 +140,7 @@ export class ReservationFormComponent implements OnInit {
     }
 
     this.isLoadingRooms = true;
-    this.roomService.getAvailableRooms(checkInDate.toISOString(), checkOutDate.toISOString(), numberOfGuests ?? 1)
+    this.roomService.getAvailableRooms(toApiDate(checkInDate), toApiDate(checkOutDate), numberOfGuests ?? 1)
       .pipe(finalize(() => this.isLoadingRooms = false))
       .subscribe(rooms => {
         this.availableRooms = this.withCurrentRoom(rooms);
@@ -168,8 +169,8 @@ export class ReservationFormComponent implements OnInit {
     ).subscribe(({ reservation, room, guest }) => {
       this.currentRoom = room;
       this.form.patchValue({
-        checkInDate: new Date(reservation.checkInDate),
-        checkOutDate: new Date(reservation.checkOutDate),
+        checkInDate: fromApiDate(reservation.checkInDate),
+        checkOutDate: fromApiDate(reservation.checkOutDate),
         numberOfGuests: reservation.numberOfGuests,
         roomId: reservation.roomId,
         guest,

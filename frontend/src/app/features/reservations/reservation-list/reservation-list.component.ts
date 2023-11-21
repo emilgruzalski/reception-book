@@ -15,6 +15,7 @@ import {
   ReservationStatus
 } from 'src/app/core/models/reservation.model';
 import { ReservationService } from 'src/app/core/services/reservation.service';
+import { toApiDate } from 'src/app/core/utils/date.utils';
 import { ConfirmDialogComponent, ConfirmDialogData } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 
 const DEFAULT_ORDER_BY = 'checkInDate desc';
@@ -55,8 +56,8 @@ export class ReservationListComponent implements OnInit {
         ...this.query,
         searchTerm: filters.searchTerm ?? undefined,
         status: filters.status ?? undefined,
-        fromDate: filters.fromDate?.toISOString(),
-        toDate: filters.toDate?.toISOString()
+        fromDate: filters.fromDate ? toApiDate(filters.fromDate) : undefined,
+        toDate: filters.toDate ? toApiDate(filters.toDate) : undefined
       };
       this.loadReservations();
     });
