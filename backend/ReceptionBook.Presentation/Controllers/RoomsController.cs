@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReceptionBook.Presentation.ActionFilters;
 using Service.Contracts;
@@ -9,6 +10,7 @@ namespace ReceptionBook.Presentation.Controllers;
 
 [Route("api/rooms")]
 [ApiController]
+[Authorize]
 public class RoomsController : ControllerBase
 {
     private readonly IServiceManager _service;
