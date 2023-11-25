@@ -1,3 +1,5 @@
+using Entities.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReceptionBook.Presentation.ActionFilters;
 using Service.Contracts;
@@ -14,6 +16,7 @@ public class AuthenticationController : ControllerBase
     public AuthenticationController(IServiceManager service) => _service = service;
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.Administrator)]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> RegisterUser([FromBody] UserForRegistrationDto userForRegistration)
     {
@@ -30,6 +33,7 @@ public class AuthenticationController : ControllerBase
     }
 
     [HttpPost("login")]
+    [AllowAnonymous]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> Authenticate([FromBody] UserForAuthenticationDto user)
     {

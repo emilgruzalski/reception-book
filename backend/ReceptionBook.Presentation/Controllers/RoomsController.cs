@@ -1,3 +1,4 @@
+using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReceptionBook.Presentation.ActionFilters;
@@ -47,6 +48,7 @@ public class RoomsController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = UserRoles.Administrator)]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateRoom([FromBody] RoomForCreationDto room)
     {
@@ -56,6 +58,7 @@ public class RoomsController : ControllerBase
     }
 
     [HttpPut("{id:guid}")]
+    [Authorize(Roles = UserRoles.Administrator)]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> UpdateRoom(Guid id, [FromBody] RoomForUpdateDto room)
     {
@@ -65,6 +68,7 @@ public class RoomsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = UserRoles.Administrator)]
     public async Task<IActionResult> DeleteRoom(Guid id)
     {
         await _service.RoomService.DeleteRoomAsync(id, trackChanges: false);

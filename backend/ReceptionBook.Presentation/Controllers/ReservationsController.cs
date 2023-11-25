@@ -1,3 +1,4 @@
+using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ReceptionBook.Presentation.ActionFilters;
@@ -54,6 +55,7 @@ public class ReservationsController : ControllerBase
     }
 
     [HttpDelete("{id:guid}")]
+    [Authorize(Roles = UserRoles.Administrator)]
     public async Task<IActionResult> DeleteReservation(Guid id)
     {
         await _service.ReservationService.DeleteReservationAsync(id, trackChanges: false);
