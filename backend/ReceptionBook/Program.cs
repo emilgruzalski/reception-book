@@ -60,4 +60,6 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+await app.SeedAdministratorAsync();
+
 app.Run();
