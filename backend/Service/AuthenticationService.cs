@@ -1,9 +1,11 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using AutoMapper;
 using Contracts;
 using Entities.ConfigurationModels;
+using Entities.Exceptions;
 using Entities.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
@@ -15,6 +17,8 @@ namespace Service;
 
 internal sealed class AuthenticationService : IAuthenticationService
 {
+    private const int RefreshTokenSizeInBytes = 64;
+
     private readonly ILoggerManager _logger;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
@@ -63,13 +67,37 @@ internal sealed class AuthenticationService : IAuthenticationService
         return result;
     }
 
-    public async Task<string> CreateToken()
+    public async Task<TokenDto> CreateToken(bool populateExp)
     {
         var signingCredentials = GetSigningCredentials();
         var claims = await GetClaims();
         var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
 
-        return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        var refreshToken = GenerateRefreshToken();
+
+        _user!.RefreshToken = refreshToken;
+        if (populateExp)
+            _user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtConfiguration.RefreshTokenExpiresInDays);
+
+        await _userManager.UpdateAsync(_user);
+
+        var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+
+        return new TokenDto(accessToken, refreshToken);
+    }
+
+    public async Task<TokenDto> RefreshToken(TokenDto tokenDto)
+    {
+        var principal = GetPrincipalFromExpiredToken(tokenDto.AccessToken);
+
+        var user = await _userManager.FindByNameAsync(principal.Identity!.Name!);
+        if (user == null || user.RefreshToken != tokenDto.RefreshToken ||
+            user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            throw new RefreshTokenBadRequestException();
+
+        _user = user;
+
+        return await CreateToken(populateExp: false);
     }
 
     private SigningCredentials GetSigningCredentials()
@@ -103,4 +131,44 @@ internal sealed class AuthenticationService : IAuthenticationService
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(_jwtConfiguration.ExpiresInMinutes),
             signingCredentials: signingCredentials);
+
+    private static string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[RefreshTokenSizeInBytes];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+
+        return Convert.ToBase64String(randomNumber);
+    }
+
+    private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+    {
+        var tokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = true,
+            ValidateIssuer = true,
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.SecretKey!)),
+            ValidateLifetime = false,
+            ValidIssuer = _jwtConfiguration.ValidIssuer,
+            ValidAudience = _jwtConfiguration.ValidAudience
+        };
+
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out var securityToken);
+
+            if (securityToken is not JwtSecurityToken jwtSecurityToken ||
+                !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256,
+                    StringComparison.InvariantCultureIgnoreCase))
+                throw new RefreshTokenBadRequestException();
+
+            return principal;
+        }
+        catch (Exception ex) when (ex is SecurityTokenException or ArgumentException)
+        {
+            throw new RefreshTokenBadRequestException();
+        }
+    }
 }

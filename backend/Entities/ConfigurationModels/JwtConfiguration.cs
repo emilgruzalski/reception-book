@@ -8,4 +8,5 @@ public class JwtConfiguration
     public string? ValidAudience { get; set; }
     public string? SecretKey { get; set; }
     public int ExpiresInMinutes { get; set; }
+    public int RefreshTokenExpiresInDays { get; set; }
 }
