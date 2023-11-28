@@ -1,0 +1,26 @@
+$card-width: 400px;
+
+.login-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 16px;
+  box-sizing: border-box;
+  background: #f5f5f5;
+}
+
+.login-card {
+  width: 100%;
+  max-width: $card-width;
+  padding: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.error-message {
+  color: #c62828;
+  margin: 0 0 8px;
+}

@@ -4,6 +4,12 @@
   </button>
   <span class="app-title">ReceptionBook</span>
   <span class="spacer"></span>
+  <ng-container *ngIf="currentUser$ | async as user">
+    <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+    <button mat-icon-button matTooltip="Wyloguj" (click)="logout()" aria-label="Wyloguj">
+      <mat-icon>logout</mat-icon>
+    </button>
+  </ng-container>
 </mat-toolbar>
 
 <mat-sidenav-container class="sidenav-container">

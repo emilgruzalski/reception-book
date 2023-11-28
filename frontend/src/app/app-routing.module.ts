@@ -6,6 +6,10 @@ import { DashboardComponent } from './features/dashboard/dashboard.component';
 
 const routes: Routes = [
   {
+    path: 'login',
+    loadChildren: () => import('./features/auth/auth.module').then(m => m.AuthModule)
+  },
+  {
     path: '',
     component: MainLayoutComponent,
     children: [
