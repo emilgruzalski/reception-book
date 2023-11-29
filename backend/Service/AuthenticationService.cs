@@ -59,12 +59,29 @@ internal sealed class AuthenticationService : IAuthenticationService
     public async Task<bool> ValidateUser(UserForAuthenticationDto userForAuth)
     {
         _user = await _userManager.FindByNameAsync(userForAuth.UserName!);
-
-        var result = _user != null && await _userManager.CheckPasswordAsync(_user, userForAuth.Password!);
-        if (!result)
+        if (_user == null)
+        {
             _logger.LogWarn($"{nameof(ValidateUser)}: Authentication failed. Wrong user name or password.");
+            return false;
+        }
 
-        return result;
+        if (await _userManager.IsLockedOutAsync(_user))
+        {
+            _logger.LogWarn($"{nameof(ValidateUser)}: Authentication failed. Account '{_user.UserName}' is locked out.");
+            return false;
+        }
+
+        if (!await _userManager.CheckPasswordAsync(_user, userForAuth.Password!))
+        {
+            // Count failed attempts so that the account gets locked out after too many tries.
+            await _userManager.AccessFailedAsync(_user);
+            _logger.LogWarn($"{nameof(ValidateUser)}: Authentication failed. Wrong user name or password.");
+            return false;
+        }
+
+        await _userManager.ResetAccessFailedCountAsync(_user);
+
+        return true;
     }
 
     public async Task<TokenDto> CreateToken(bool populateExp)
