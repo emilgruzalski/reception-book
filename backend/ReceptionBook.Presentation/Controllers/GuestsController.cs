@@ -1,5 +1,6 @@
 using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ReceptionBook.Presentation.ActionFilters;
 using Service.Contracts;
@@ -23,7 +24,7 @@ public class GuestsController : ControllerBase
     {
         var pagedResult = await _service.GuestService.GetAllGuestsAsync(guestParameters, trackChanges: false);
 
-        Response.Headers.Add("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
 
         return Ok(pagedResult.guests);
     }
