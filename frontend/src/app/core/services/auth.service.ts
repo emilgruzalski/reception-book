@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, tap, throwError } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
 import { CurrentUser, LoginRequest, TokenResponse } from '../models/auth.model';
@@ -23,6 +23,7 @@ const CLAIMS = {
 })
 export class AuthService {
   private readonly url = `${environment.apiUrl}/authentication`;
+  private readonly tokenUrl = `${environment.apiUrl}/token`;
   private readonly jwtHelper = new JwtHelperService();
   private readonly currentUserSubject = new BehaviorSubject<CurrentUser | null>(this.readCurrentUser());
 
@@ -44,14 +45,26 @@ export class AuthService {
     );
   }
 
+  refreshToken(): Observable<TokenResponse> {
+    const accessToken = this.getAccessToken();
+    const refreshToken = this.getRefreshToken();
+    if (!accessToken || !refreshToken) {
+      return throwError(() => new Error('No tokens to refresh.'));
+    }
+
+    return this.http.post<TokenResponse>(`${this.tokenUrl}/refresh`, { accessToken, refreshToken }).pipe(
+      tap(tokens => this.storeTokens(tokens))
+    );
+  }
+
   logout(): void {
     this.clearTokens();
     this.router.navigate(['/login']);
   }
 
+  /** An expired access token is fine as long as there is a refresh token to renew it. */
   isAuthenticated(): boolean {
-    const token = this.getAccessToken();
-    return !!token && !this.jwtHelper.isTokenExpired(token);
+    return !!this.getAccessToken() && !!this.getRefreshToken();
   }
 
   hasAnyRole(roles: readonly string[]): boolean {
@@ -61,6 +74,14 @@ export class AuthService {
 
   getAccessToken(): string | null {
     return localStorage.getItem(ACCESS_TOKEN_KEY);
+  }
+
+  isAuthRequest(url: string): boolean {
+    return url.startsWith(`${this.url}/login`) || url.startsWith(`${this.tokenUrl}/refresh`);
+  }
+
+  private getRefreshToken(): string | null {
+    return localStorage.getItem(REFRESH_TOKEN_KEY);
   }
 
   private storeTokens(tokens: TokenResponse): void {
