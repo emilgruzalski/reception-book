@@ -1,10 +1,13 @@
 using System.Text;
+using System.Threading.RateLimiting;
 using Contracts;
 using Entities.ConfigurationModels;
+using Entities.ErrorModel;
 using Entities.Models;
 using LoggerService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Repository;
@@ -92,4 +95,50 @@ public static class ServiceExtensions
 
     public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration) =>
         services.Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
+
+    public static void ConfigureRateLimiting(this IServiceCollection services, IConfiguration configuration)
+    {
+        var settings = configuration.GetSection(RateLimitingConfiguration.Section).Get<RateLimitingConfiguration>()
+                       ?? new RateLimitingConfiguration();
+
+        services.AddRateLimiter(options =>
+        {
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: GetClientIpAddress(context),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = settings.GlobalPermitLimit,
+                        Window = TimeSpan.FromSeconds(settings.GlobalWindowInSeconds),
+                        QueueLimit = 0
+                    }));
+
+            // Stricter limit for endpoints that accept credentials to slow down brute-force attacks.
+            options.AddPolicy(RateLimitPolicies.Authentication, context =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: GetClientIpAddress(context),
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = settings.AuthenticationPermitLimit,
+                        Window = TimeSpan.FromSeconds(settings.AuthenticationWindowInSeconds),
+                        QueueLimit = 0
+                    }));
+
+            options.OnRejected = async (context, token) =>
+            {
+                context.HttpContext.Response.ContentType = "application/json";
+
+                await context.HttpContext.Response.WriteAsync(new ErrorDetails
+                {
+                    StatusCode = StatusCodes.Status429TooManyRequests,
+                    Message = "Too many requests. Please try again later."
+                }.ToString(), token);
+            };
+        });
+    }
+
+    private static string GetClientIpAddress(HttpContext context) =>
+        context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 }

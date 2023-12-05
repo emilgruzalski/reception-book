@@ -1,6 +1,8 @@
+using Entities.ConfigurationModels;
 using Entities.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using ReceptionBook.Presentation.ActionFilters;
 using Service.Contracts;
 using Shared.DataTransferObjects;
@@ -9,6 +11,7 @@ namespace ReceptionBook.Presentation.Controllers;
 
 [Route("api/authentication")]
 [ApiController]
+[EnableRateLimiting(RateLimitPolicies.Authentication)]
 public class AuthenticationController : ControllerBase
 {
     private readonly IServiceManager _service;
