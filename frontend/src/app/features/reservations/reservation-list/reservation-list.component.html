@@ -80,7 +80,8 @@
         <a mat-icon-button matTooltip="Edytuj" [routerLink]="[reservation.id, 'edit']">
           <mat-icon>edit</mat-icon>
         </a>
-        <button mat-icon-button color="warn" matTooltip="Usuń" (click)="deleteReservation(reservation)">
+        <button mat-icon-button color="warn" matTooltip="Usuń" (click)="deleteReservation(reservation)"
+                *appHasRole="administratorOnly">
           <mat-icon>delete</mat-icon>
         </button>
       </td>

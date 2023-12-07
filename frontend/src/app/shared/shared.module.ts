@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 
 import { MaterialModule } from './material.module';
 import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
+import { HasRoleDirective } from './directives/has-role.directive';
 import { ReservationStatusPipe } from './pipes/reservation-status.pipe';
 import { RoomStatusPipe } from './pipes/room-status.pipe';
 import { RoomTypePipe } from './pipes/room-type.pipe';
@@ -18,12 +19,14 @@ import { RoomTypePipe } from './pipes/room-type.pipe';
   ],
   imports: [
     CommonModule,
+    HasRoleDirective,
     ReactiveFormsModule,
     RouterModule,
     MaterialModule
   ],
   exports: [
     CommonModule,
+    HasRoleDirective,
     ReactiveFormsModule,
     RouterModule,
     MaterialModule,

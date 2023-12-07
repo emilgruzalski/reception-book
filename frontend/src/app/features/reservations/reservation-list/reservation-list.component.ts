@@ -7,6 +7,7 @@ import { Sort } from '@angular/material/sort';
 import { debounceTime, filter, finalize, switchMap } from 'rxjs';
 
 import { SEARCH_DEBOUNCE_MS } from 'src/app/core/constants';
+import { ADMINISTRATOR_ONLY } from 'src/app/core/models/auth.model';
 import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from 'src/app/core/models/paged-result.model';
 import {
   Reservation,
@@ -25,6 +26,7 @@ const DEFAULT_ORDER_BY = 'checkInDate desc';
   templateUrl: './reservation-list.component.html'
 })
 export class ReservationListComponent implements OnInit {
+  readonly administratorOnly = ADMINISTRATOR_ONLY;
   readonly displayedColumns = [
     'guestFullName', 'roomNumber', 'checkInDate', 'checkOutDate', 'numberOfGuests', 'totalPrice', 'status', 'actions'
   ];

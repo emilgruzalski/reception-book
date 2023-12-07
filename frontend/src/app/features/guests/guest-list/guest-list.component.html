@@ -49,7 +49,8 @@
         <button mat-icon-button matTooltip="Edytuj" (click)="openGuestDialog(guest)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="warn" matTooltip="Usuń" (click)="deleteGuest(guest)">
+        <button mat-icon-button color="warn" matTooltip="Usuń" (click)="deleteGuest(guest)"
+                *appHasRole="administratorOnly">
           <mat-icon>delete</mat-icon>
         </button>
       </td>

@@ -21,3 +21,5 @@ export interface CurrentUser {
   lastName: string;
   roles: string[];
 }
+
+export const ADMINISTRATOR_ONLY: readonly UserRole[] = [UserRoles.Administrator];

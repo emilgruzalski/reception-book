@@ -6,6 +6,7 @@ import { PageEvent } from '@angular/material/paginator';
 import { debounceTime, distinctUntilChanged, filter, finalize, switchMap } from 'rxjs';
 
 import { SEARCH_DEBOUNCE_MS } from 'src/app/core/constants';
+import { ADMINISTRATOR_ONLY } from 'src/app/core/models/auth.model';
 import { Guest, GuestQuery } from 'src/app/core/models/guest.model';
 import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from 'src/app/core/models/paged-result.model';
 import { GuestService } from 'src/app/core/services/guest.service';
@@ -17,6 +18,7 @@ import { GuestFormDialogComponent, GuestFormDialogData } from '../guest-form-dia
   templateUrl: './guest-list.component.html'
 })
 export class GuestListComponent implements OnInit {
+  readonly administratorOnly = ADMINISTRATOR_ONLY;
   readonly displayedColumns = ['name', 'documentNumber', 'email', 'phoneNumber', 'createdAt', 'actions'];
 
   readonly pageSizeOptions = PAGE_SIZE_OPTIONS;

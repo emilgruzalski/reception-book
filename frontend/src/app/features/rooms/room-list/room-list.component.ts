@@ -7,6 +7,7 @@ import { Sort } from '@angular/material/sort';
 import { debounceTime, filter, finalize, switchMap } from 'rxjs';
 
 import { SEARCH_DEBOUNCE_MS } from 'src/app/core/constants';
+import { ADMINISTRATOR_ONLY } from 'src/app/core/models/auth.model';
 import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from 'src/app/core/models/paged-result.model';
 import { Room, ROOM_STATUSES, ROOM_TYPES, RoomQuery, RoomStatus, RoomType } from 'src/app/core/models/room.model';
 import { RoomService } from 'src/app/core/services/room.service';
@@ -21,6 +22,7 @@ const DEFAULT_ORDER_BY = 'number';
   styleUrls: ['./room-list.component.scss']
 })
 export class RoomListComponent implements OnInit {
+  readonly administratorOnly = ADMINISTRATOR_ONLY;
   readonly displayedColumns = ['number', 'floor', 'type', 'capacity', 'pricePerNight', 'status', 'actions'];
   readonly pageSizeOptions = PAGE_SIZE_OPTIONS;
   readonly roomTypes = ROOM_TYPES;
