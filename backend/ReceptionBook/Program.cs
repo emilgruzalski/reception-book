@@ -4,9 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 using NLog;
 using System.Text.Json.Serialization;
 using ReceptionBook.Extensions;
+using ReceptionBook.Middleware;
 using ReceptionBook.Presentation.ActionFilters;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 LogManager.Setup().LoadConfigurationFromFile(Path.Combine(Directory.GetCurrentDirectory(), "nlog.config"));
 
@@ -40,6 +43,8 @@ var app = builder.Build();
 
 var logger = app.Services.GetRequiredService<ILoggerManager>();
 app.ConfigureExceptionHandler(logger);
+
+app.UseMiddleware<SecurityHeadersMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
