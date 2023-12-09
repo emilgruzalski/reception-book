@@ -18,6 +18,8 @@ namespace ReceptionBook.Extensions;
 
 public static class ServiceExtensions
 {
+    private const int HstsMaxAgeInDays = 365;
+
     public static void ConfigureCors(this IServiceCollection services) =>
         services.AddCors(options =>
         {
@@ -31,6 +33,14 @@ public static class ServiceExtensions
     public static void ConfigureIISIntegration(this IServiceCollection services) =>
         services.Configure<IISOptions>(options =>
         {
+        });
+
+    public static void ConfigureHsts(this IServiceCollection services) =>
+        services.AddHsts(options =>
+        {
+            options.Preload = true;
+            options.IncludeSubDomains = true;
+            options.MaxAge = TimeSpan.FromDays(HstsMaxAgeInDays);
         });
 
     public static void ConfigureLoggerService(this IServiceCollection services) =>
