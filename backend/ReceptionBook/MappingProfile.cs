@@ -23,5 +23,9 @@ public class MappingProfile : Profile
         CreateMap<ReservationForUpdateDto, Reservation>();
 
         CreateMap<UserForRegistrationDto, User>();
+        CreateMap<User, UserDto>()
+            .ForMember(u => u.Roles, opt => opt.Ignore())
+            .ForMember(u => u.IsLockedOut, opt => opt.Ignore());
+        CreateMap<UserForUpdateDto, User>();
     }
 }
