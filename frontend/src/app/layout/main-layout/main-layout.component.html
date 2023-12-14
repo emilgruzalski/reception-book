@@ -31,6 +31,10 @@
         <mat-icon matListItemIcon>event</mat-icon>
         <span matListItemTitle>Rezerwacje</span>
       </a>
+      <a mat-list-item routerLink="/users" routerLinkActive="active-link" *appHasRole="administratorOnly">
+        <mat-icon matListItemIcon>manage_accounts</mat-icon>
+        <span matListItemTitle>Użytkownicy</span>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
 

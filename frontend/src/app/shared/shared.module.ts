@@ -9,13 +9,15 @@ import { HasRoleDirective } from './directives/has-role.directive';
 import { ReservationStatusPipe } from './pipes/reservation-status.pipe';
 import { RoomStatusPipe } from './pipes/room-status.pipe';
 import { RoomTypePipe } from './pipes/room-type.pipe';
+import { UserRolePipe } from './pipes/user-role.pipe';
 
 @NgModule({
   declarations: [
     ConfirmDialogComponent,
     ReservationStatusPipe,
     RoomStatusPipe,
-    RoomTypePipe
+    RoomTypePipe,
+    UserRolePipe
   ],
   imports: [
     CommonModule,
@@ -32,7 +34,8 @@ import { RoomTypePipe } from './pipes/room-type.pipe';
     MaterialModule,
     ReservationStatusPipe,
     RoomStatusPipe,
-    RoomTypePipe
+    RoomTypePipe,
+    UserRolePipe
   ]
 })
 export class SharedModule { }

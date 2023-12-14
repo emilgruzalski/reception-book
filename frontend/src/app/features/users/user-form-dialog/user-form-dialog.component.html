@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Edytuj użytkownika' : 'Nowy użytkownik' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="form-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Imię</mat-label>
+      <input matInput formControlName="firstName" required>
+      <mat-error>Imię jest wymagane.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nazwisko</mat-label>
+      <input matInput formControlName="lastName" required>
+      <mat-error>Nazwisko jest wymagane.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Nazwa użytkownika</mat-label>
+      <input matInput formControlName="userName" autocomplete="off" required>
+      <mat-error>Nazwa użytkownika jest wymagana.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>E-mail</mat-label>
+      <input matInput type="email" formControlName="email" required>
+      <mat-error>Podaj poprawny adres e-mail.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Telefon</mat-label>
+      <input matInput type="tel" formControlName="phoneNumber">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Role</mat-label>
+      <mat-select formControlName="roles" multiple required>
+        <mat-option *ngFor="let role of roles" [value]="role">{{ role | userRole }}</mat-option>
+      </mat-select>
+      <mat-error>Wybierz co najmniej jedną rolę.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width" *ngIf="!isEditMode">
+      <mat-label>Hasło początkowe</mat-label>
+      <input matInput type="password" formControlName="password" autocomplete="new-password" required>
+      <mat-hint>Min. {{ passwordMinLength }} znaków, wielka i mała litera, cyfra oraz znak specjalny.</mat-hint>
+      <mat-error>Hasło nie spełnia wymagań bezpieczeństwa.</mat-error>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Anuluj</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="isSaving">Zapisz</button>
+  </mat-dialog-actions>
+</form>

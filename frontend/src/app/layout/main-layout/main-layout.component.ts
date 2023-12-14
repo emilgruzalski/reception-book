@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 
+import { ADMINISTRATOR_ONLY } from 'src/app/core/models/auth.model';
 import { AuthService } from 'src/app/core/services/auth.service';
 
 @Component({
@@ -8,6 +9,7 @@ import { AuthService } from 'src/app/core/services/auth.service';
   styleUrls: ['./main-layout.component.scss']
 })
 export class MainLayoutComponent {
+  readonly administratorOnly = ADMINISTRATOR_ONLY;
   readonly currentUser$ = this.authService.currentUser$;
 
   constructor(private authService: AuthService) { }

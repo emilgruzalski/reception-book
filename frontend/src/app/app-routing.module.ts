@@ -4,6 +4,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { authGuard } from './core/guards/auth.guard';
+import { roleGuard } from './core/guards/role.guard';
+import { ADMINISTRATOR_ONLY } from './core/models/auth.model';
 
 const routes: Routes = [
   {
@@ -28,6 +30,12 @@ const routes: Routes = [
       {
         path: 'reservations',
         loadChildren: () => import('./features/reservations/reservations.module').then(m => m.ReservationsModule)
+      },
+      {
+        path: 'users',
+        canActivate: [roleGuard],
+        data: { roles: ADMINISTRATOR_ONLY },
+        loadChildren: () => import('./features/users/users.module').then(m => m.UsersModule)
       }
     ]
   },
