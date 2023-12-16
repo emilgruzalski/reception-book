@@ -75,6 +75,52 @@ internal sealed class ReservationService : IReservationService
         await _repository.SaveAsync();
     }
 
+    public async Task CheckInAsync(Guid reservationId)
+    {
+        var reservation = await GetReservationAndCheckIfItExists(reservationId, trackChanges: true);
+        var room = reservation.Room!;
+
+        if (reservation.Status != ReservationStatus.Confirmed)
+            throw new InvalidReservationStatusBadRequestException(reservation.Status, "check in");
+
+        var today = DateTime.Today;
+        if (today < reservation.CheckInDate || today >= reservation.CheckOutDate)
+            throw new CheckInDateBadRequestException(reservation.CheckInDate);
+
+        if (room.Status != RoomStatus.Available)
+            throw new RoomNotReadyBadRequestException(room.Number!, room.Status);
+
+        reservation.Status = ReservationStatus.CheckedIn;
+        room.Status = RoomStatus.Occupied;
+
+        await _repository.SaveAsync();
+    }
+
+    public async Task CheckOutAsync(Guid reservationId)
+    {
+        var reservation = await GetReservationAndCheckIfItExists(reservationId, trackChanges: true);
+
+        if (reservation.Status != ReservationStatus.CheckedIn)
+            throw new InvalidReservationStatusBadRequestException(reservation.Status, "check out");
+
+        reservation.Status = ReservationStatus.CheckedOut;
+        reservation.Room!.Status = RoomStatus.Cleaning;
+
+        await _repository.SaveAsync();
+    }
+
+    public async Task CancelAsync(Guid reservationId)
+    {
+        var reservation = await GetReservationAndCheckIfItExists(reservationId, trackChanges: true);
+
+        if (reservation.Status != ReservationStatus.Confirmed)
+            throw new InvalidReservationStatusBadRequestException(reservation.Status, "cancel");
+
+        reservation.Status = ReservationStatus.Cancelled;
+
+        await _repository.SaveAsync();
+    }
+
     public async Task DeleteReservationAsync(Guid reservationId, bool trackChanges)
     {
         var reservation = await GetReservationAndCheckIfItExists(reservationId, trackChanges);

@@ -55,6 +55,30 @@ public class ReservationsController : ControllerBase
         return NoContent();
     }
 
+    [HttpPost("{id:guid}/check-in")]
+    public async Task<IActionResult> CheckIn(Guid id)
+    {
+        await _service.ReservationService.CheckInAsync(id);
+
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/check-out")]
+    public async Task<IActionResult> CheckOut(Guid id)
+    {
+        await _service.ReservationService.CheckOutAsync(id);
+
+        return NoContent();
+    }
+
+    [HttpPost("{id:guid}/cancel")]
+    public async Task<IActionResult> Cancel(Guid id)
+    {
+        await _service.ReservationService.CancelAsync(id);
+
+        return NoContent();
+    }
+
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = UserRoles.Administrator)]
     public async Task<IActionResult> DeleteReservation(Guid id)

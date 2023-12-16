@@ -10,5 +10,8 @@ public interface IReservationService
     Task<ReservationDto> GetReservationAsync(Guid reservationId, bool trackChanges);
     Task<ReservationDto> CreateReservationAsync(ReservationForCreationDto reservationForCreation);
     Task UpdateReservationAsync(Guid reservationId, ReservationForUpdateDto reservationForUpdate, bool trackChanges);
+    Task CheckInAsync(Guid reservationId);
+    Task CheckOutAsync(Guid reservationId);
+    Task CancelAsync(Guid reservationId);
     Task DeleteReservationAsync(Guid reservationId, bool trackChanges);
 }
