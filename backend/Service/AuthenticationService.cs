@@ -117,6 +117,18 @@ internal sealed class AuthenticationService : IAuthenticationService
         return await CreateToken(populateExp: false);
     }
 
+    public async Task RevokeRefreshToken(string userName)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user is null)
+            return;
+
+        user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = DateTime.MinValue;
+
+        await _userManager.UpdateAsync(user);
+    }
+
     private SigningCredentials GetSigningCredentials()
     {
         var key = Encoding.UTF8.GetBytes(_jwtConfiguration.SecretKey!);

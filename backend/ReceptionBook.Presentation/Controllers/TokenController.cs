@@ -1,4 +1,5 @@
 using Entities.ConfigurationModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using ReceptionBook.Presentation.ActionFilters;
@@ -23,5 +24,14 @@ public class TokenController : ControllerBase
         var tokenDtoToReturn = await _service.AuthenticationService.RefreshToken(tokenDto);
 
         return Ok(tokenDtoToReturn);
+    }
+
+    [HttpPost("revoke")]
+    [Authorize]
+    public async Task<IActionResult> Revoke()
+    {
+        await _service.AuthenticationService.RevokeRefreshToken(User.Identity!.Name!);
+
+        return NoContent();
     }
 }
