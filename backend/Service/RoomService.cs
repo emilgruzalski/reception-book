@@ -78,6 +78,15 @@ internal sealed class RoomService : IRoomService
         await _repository.SaveAsync();
     }
 
+    public async Task UpdateRoomStatusAsync(Guid roomId, RoomStatusForUpdateDto roomStatusForUpdate,
+        bool trackChanges)
+    {
+        var room = await GetRoomAndCheckIfItExists(roomId, trackChanges);
+
+        room.Status = roomStatusForUpdate.Status!.Value;
+        await _repository.SaveAsync();
+    }
+
     public async Task DeleteRoomAsync(Guid roomId, bool trackChanges)
     {
         var room = await GetRoomAndCheckIfItExists(roomId, trackChanges);

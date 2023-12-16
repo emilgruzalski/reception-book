@@ -68,6 +68,15 @@ public class RoomsController : ControllerBase
         return NoContent();
     }
 
+    [HttpPut("{id:guid}/status")]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
+    public async Task<IActionResult> UpdateRoomStatus(Guid id, [FromBody] RoomStatusForUpdateDto roomStatus)
+    {
+        await _service.RoomService.UpdateRoomStatusAsync(id, roomStatus, trackChanges: true);
+
+        return NoContent();
+    }
+
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = UserRoles.Administrator)]
     public async Task<IActionResult> DeleteRoom(Guid id)
