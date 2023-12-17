@@ -83,6 +83,10 @@ export class RoomListComponent implements OnInit {
     this.loadRooms();
   }
 
+  changeStatus(room: Room, status: RoomStatus): void {
+    this.roomService.updateRoomStatus(room.id, status).subscribe(() => this.loadRooms());
+  }
+
   openRoomDialog(room?: Room): void {
     this.dialog.open<RoomFormDialogComponent, RoomFormDialogData, boolean>(RoomFormDialogComponent, {
       width: '600px',

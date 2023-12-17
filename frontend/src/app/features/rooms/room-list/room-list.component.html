@@ -70,6 +70,15 @@
     <ng-container matColumnDef="actions">
       <th mat-header-cell *matHeaderCellDef></th>
       <td mat-cell *matCellDef="let room" class="actions-cell">
+        <button mat-icon-button matTooltip="Zmień status" [matMenuTriggerFor]="statusMenu">
+          <mat-icon>published_with_changes</mat-icon>
+        </button>
+        <mat-menu #statusMenu="matMenu">
+          <button mat-menu-item *ngFor="let status of roomStatuses" [disabled]="status === room.status"
+                  (click)="changeStatus(room, status)">
+            {{ status | roomStatus }}
+          </button>
+        </mat-menu>
         <ng-container *appHasRole="administratorOnly">
           <button mat-icon-button matTooltip="Edytuj" (click)="openRoomDialog(room)">
             <mat-icon>edit</mat-icon>

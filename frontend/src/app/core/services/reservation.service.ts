@@ -32,6 +32,18 @@ export class ReservationService {
     return this.http.put<void>(`${this.url}/${id}`, reservation);
   }
 
+  checkIn(id: string): Observable<void> {
+    return this.http.post<void>(`${this.url}/${id}/check-in`, null);
+  }
+
+  checkOut(id: string): Observable<void> {
+    return this.http.post<void>(`${this.url}/${id}/check-out`, null);
+  }
+
+  cancel(id: string): Observable<void> {
+    return this.http.post<void>(`${this.url}/${id}/cancel`, null);
+  }
+
   deleteReservation(id: string): Observable<void> {
     return this.http.delete<void>(`${this.url}/${id}`);
   }

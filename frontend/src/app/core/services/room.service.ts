@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
-import { Room, RoomForManipulation, RoomQuery } from '../models/room.model';
+import { Room, RoomForManipulation, RoomQuery, RoomStatus } from '../models/room.model';
 import { PagedResult } from '../models/paged-result.model';
 import { toHttpParams, toPagedResult } from '../utils/http.utils';
 
@@ -35,6 +35,10 @@ export class RoomService {
 
   updateRoom(id: string, room: RoomForManipulation): Observable<void> {
     return this.http.put<void>(`${this.url}/${id}`, room);
+  }
+
+  updateRoomStatus(id: string, status: RoomStatus): Observable<void> {
+    return this.http.put<void>(`${this.url}/${id}/status`, { status });
   }
 
   deleteRoom(id: string): Observable<void> {

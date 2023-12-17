@@ -90,6 +90,27 @@ export class ReservationListComponent implements OnInit {
     this.loadReservations();
   }
 
+  checkIn(reservation: Reservation): void {
+    this.reservationService.checkIn(reservation.id).subscribe(() => this.loadReservations());
+  }
+
+  checkOut(reservation: Reservation): void {
+    this.reservationService.checkOut(reservation.id).subscribe(() => this.loadReservations());
+  }
+
+  cancel(reservation: Reservation): void {
+    this.dialog.open<ConfirmDialogComponent, ConfirmDialogData, boolean>(ConfirmDialogComponent, {
+      data: {
+        title: 'Anuluj rezerwację',
+        message: `Czy na pewno chcesz anulować rezerwację pokoju ${reservation.roomNumber} dla ${reservation.guestFullName}?`,
+        confirmText: 'Anuluj rezerwację'
+      }
+    }).afterClosed().pipe(
+      filter(confirmed => !!confirmed),
+      switchMap(() => this.reservationService.cancel(reservation.id))
+    ).subscribe(() => this.loadReservations());
+  }
+
   deleteReservation(reservation: Reservation): void {
     this.dialog.open<ConfirmDialogComponent, ConfirmDialogData, boolean>(ConfirmDialogComponent, {
       data: {
