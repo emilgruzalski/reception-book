@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { JwtHelperService } from '@auth0/angular-jwt';
-import { BehaviorSubject, map, Observable, tap, throwError } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
 import { CurrentUser, LoginRequest, TokenResponse } from '../models/auth.model';
@@ -57,7 +57,17 @@ export class AuthService {
     );
   }
 
+  /** Revokes the refresh token on the server, so it cannot be used after logging out. */
   logout(): void {
+    const revoke$ = this.getAccessToken()
+      ? this.http.post<void>(`${this.tokenUrl}/revoke`, null).pipe(catchError(() => of(undefined)))
+      : of(undefined);
+
+    revoke$.subscribe(() => this.endSession());
+  }
+
+  /** Clears the local session without calling the API, e.g. when the refresh token is no longer valid. */
+  endSession(): void {
     this.clearTokens();
     this.router.navigate(['/login']);
   }
@@ -76,8 +86,9 @@ export class AuthService {
     return localStorage.getItem(ACCESS_TOKEN_KEY);
   }
 
+  /** Requests that must not trigger a token refresh when they return 401. */
   isAuthRequest(url: string): boolean {
-    return url.startsWith(`${this.url}/login`) || url.startsWith(`${this.tokenUrl}/refresh`);
+    return url.startsWith(`${this.url}/login`) || url.startsWith(this.tokenUrl);
   }
 
   private getRefreshToken(): string | null {
