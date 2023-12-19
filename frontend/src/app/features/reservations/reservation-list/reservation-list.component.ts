@@ -17,6 +17,7 @@ import {
 } from 'src/app/core/models/reservation.model';
 import { ReservationService } from 'src/app/core/services/reservation.service';
 import { toApiDate } from 'src/app/core/utils/date.utils';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 
 const DEFAULT_ORDER_BY = 'checkInDate desc';
@@ -48,7 +49,8 @@ export class ReservationListComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private reservationService: ReservationService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private notificationService: NotificationService
   ) {
     this.filtersForm.valueChanges.pipe(
       debounceTime(SEARCH_DEBOUNCE_MS),
@@ -91,11 +93,17 @@ export class ReservationListComponent implements OnInit {
   }
 
   checkIn(reservation: Reservation): void {
-    this.reservationService.checkIn(reservation.id).subscribe(() => this.loadReservations());
+    this.reservationService.checkIn(reservation.id).subscribe(() => {
+      this.notificationService.success(`Zameldowano gościa w pokoju ${reservation.roomNumber}.`);
+      this.loadReservations();
+    });
   }
 
   checkOut(reservation: Reservation): void {
-    this.reservationService.checkOut(reservation.id).subscribe(() => this.loadReservations());
+    this.reservationService.checkOut(reservation.id).subscribe(() => {
+      this.notificationService.success(`Wymeldowano gościa z pokoju ${reservation.roomNumber}.`);
+      this.loadReservations();
+    });
   }
 
   cancel(reservation: Reservation): void {
@@ -108,7 +116,10 @@ export class ReservationListComponent implements OnInit {
     }).afterClosed().pipe(
       filter(confirmed => !!confirmed),
       switchMap(() => this.reservationService.cancel(reservation.id))
-    ).subscribe(() => this.loadReservations());
+    ).subscribe(() => {
+      this.notificationService.success('Anulowano rezerwację.');
+      this.loadReservations();
+    });
   }
 
   deleteReservation(reservation: Reservation): void {
@@ -120,6 +131,9 @@ export class ReservationListComponent implements OnInit {
     }).afterClosed().pipe(
       filter(confirmed => !!confirmed),
       switchMap(() => this.reservationService.deleteReservation(reservation.id))
-    ).subscribe(() => this.loadReservations());
+    ).subscribe(() => {
+      this.notificationService.success('Usunięto rezerwację.');
+      this.loadReservations();
+    });
   }
 }

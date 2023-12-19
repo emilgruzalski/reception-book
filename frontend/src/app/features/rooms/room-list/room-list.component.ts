@@ -11,6 +11,7 @@ import { ADMINISTRATOR_ONLY } from 'src/app/core/models/auth.model';
 import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from 'src/app/core/models/paged-result.model';
 import { Room, ROOM_STATUSES, ROOM_TYPES, RoomQuery, RoomStatus, RoomType } from 'src/app/core/models/room.model';
 import { RoomService } from 'src/app/core/services/room.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 import { RoomFormDialogComponent, RoomFormDialogData } from '../room-form-dialog/room-form-dialog.component';
 
@@ -42,7 +43,8 @@ export class RoomListComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private roomService: RoomService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private notificationService: NotificationService
   ) {
     this.filtersForm.valueChanges.pipe(
       debounceTime(SEARCH_DEBOUNCE_MS),
@@ -84,7 +86,10 @@ export class RoomListComponent implements OnInit {
   }
 
   changeStatus(room: Room, status: RoomStatus): void {
-    this.roomService.updateRoomStatus(room.id, status).subscribe(() => this.loadRooms());
+    this.roomService.updateRoomStatus(room.id, status).subscribe(() => {
+      this.notificationService.success(`Zmieniono status pokoju ${room.number}.`);
+      this.loadRooms();
+    });
   }
 
   openRoomDialog(room?: Room): void {
@@ -93,6 +98,7 @@ export class RoomListComponent implements OnInit {
       data: { room }
     }).afterClosed().subscribe(saved => {
       if (saved) {
+        this.notificationService.success('Zapisano dane pokoju.');
         this.loadRooms();
       }
     });
@@ -107,6 +113,9 @@ export class RoomListComponent implements OnInit {
     }).afterClosed().pipe(
       filter(confirmed => !!confirmed),
       switchMap(() => this.roomService.deleteRoom(room.id))
-    ).subscribe(() => this.loadRooms());
+    ).subscribe(() => {
+      this.notificationService.success(`Usunięto pokój ${room.number}.`);
+      this.loadRooms();
+    });
   }
 }

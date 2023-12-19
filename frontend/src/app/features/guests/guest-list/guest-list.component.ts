@@ -10,6 +10,7 @@ import { ADMINISTRATOR_ONLY } from 'src/app/core/models/auth.model';
 import { Guest, GuestQuery } from 'src/app/core/models/guest.model';
 import { DEFAULT_PAGE_SIZE, PAGE_SIZE_OPTIONS } from 'src/app/core/models/paged-result.model';
 import { GuestService } from 'src/app/core/services/guest.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 import { GuestFormDialogComponent, GuestFormDialogData } from '../guest-form-dialog/guest-form-dialog.component';
 
@@ -31,7 +32,8 @@ export class GuestListComponent implements OnInit {
 
   constructor(
     private guestService: GuestService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private notificationService: NotificationService
   ) {
     this.searchControl.valueChanges.pipe(
       debounceTime(SEARCH_DEBOUNCE_MS),
@@ -68,6 +70,7 @@ export class GuestListComponent implements OnInit {
       data: { guest }
     }).afterClosed().subscribe(saved => {
       if (saved) {
+        this.notificationService.success('Zapisano dane gościa.');
         this.loadGuests();
       }
     });
@@ -82,6 +85,9 @@ export class GuestListComponent implements OnInit {
     }).afterClosed().pipe(
       filter(confirmed => !!confirmed),
       switchMap(() => this.guestService.deleteGuest(guest.id))
-    ).subscribe(() => this.loadGuests());
+    ).subscribe(() => {
+      this.notificationService.success('Usunięto gościa.');
+      this.loadGuests();
+    });
   }
 }

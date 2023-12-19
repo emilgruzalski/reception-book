@@ -6,6 +6,7 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MAT_DATE_LOCALE } from '@angular/material/core';
 import { MatPaginatorIntl } from '@angular/material/paginator';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,6 +14,7 @@ import { LayoutModule } from './layout/layout.module';
 import { DashboardComponent } from './features/dashboard/dashboard.component';
 import { PolishPaginatorIntl } from './core/i18n/polish-paginator-intl';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 
 registerLocaleData(localePl);
 
@@ -26,14 +28,16 @@ registerLocaleData(localePl);
     BrowserAnimationsModule,
     HttpClientModule,
     AppRoutingModule,
-    LayoutModule
+    LayoutModule,
+    MatSnackBarModule
   ],
   providers: [
     { provide: LOCALE_ID, useValue: 'pl' },
     { provide: MAT_DATE_LOCALE, useValue: 'pl-PL' },
     { provide: DEFAULT_CURRENCY_CODE, useValue: 'PLN' },
     { provide: MatPaginatorIntl, useClass: PolishPaginatorIntl },
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
   ],
   bootstrap: [AppComponent]
 })

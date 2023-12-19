@@ -4,6 +4,7 @@ import { filter, finalize, switchMap } from 'rxjs';
 
 import { User } from 'src/app/core/models/user.model';
 import { UserService } from 'src/app/core/services/user.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { ConfirmDialogComponent, ConfirmDialogData } from 'src/app/shared/components/confirm-dialog/confirm-dialog.component';
 import { UserFormDialogComponent, UserFormDialogData } from '../user-form-dialog/user-form-dialog.component';
 
@@ -19,7 +20,8 @@ export class UserListComponent implements OnInit {
 
   constructor(
     private userService: UserService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private notificationService: NotificationService
   ) { }
 
   ngOnInit(): void {
@@ -39,13 +41,17 @@ export class UserListComponent implements OnInit {
       data: { user }
     }).afterClosed().subscribe(saved => {
       if (saved) {
+        this.notificationService.success('Zapisano dane użytkownika.');
         this.loadUsers();
       }
     });
   }
 
   unlockUser(user: User): void {
-    this.userService.unlockUser(user.id).subscribe(() => this.loadUsers());
+    this.userService.unlockUser(user.id).subscribe(() => {
+      this.notificationService.success(`Odblokowano konto ${user.userName}.`);
+      this.loadUsers();
+    });
   }
 
   deleteUser(user: User): void {
@@ -57,6 +63,9 @@ export class UserListComponent implements OnInit {
     }).afterClosed().pipe(
       filter(confirmed => !!confirmed),
       switchMap(() => this.userService.deleteUser(user.id))
-    ).subscribe(() => this.loadUsers());
+    ).subscribe(() => {
+      this.notificationService.success(`Usunięto konto ${user.userName}.`);
+      this.loadUsers();
+    });
   }
 }

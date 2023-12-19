@@ -68,3 +68,15 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     max-width: 480px;
   }
 }
+
+.mat-mdc-snack-bar-container {
+  &.snackbar-success {
+    --mdc-snackbar-container-color: #2e7d32;
+    --mat-mdc-snack-bar-button-color: #fff;
+  }
+
+  &.snackbar-error {
+    --mdc-snackbar-container-color: #c62828;
+    --mat-mdc-snack-bar-button-color: #fff;
+  }
+}

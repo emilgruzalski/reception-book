@@ -9,6 +9,7 @@ import { Guest } from 'src/app/core/models/guest.model';
 import { ReservationForManipulation } from 'src/app/core/models/reservation.model';
 import { Room } from 'src/app/core/models/room.model';
 import { GuestService } from 'src/app/core/services/guest.service';
+import { NotificationService } from 'src/app/core/services/notification.service';
 import { fromApiDate, toApiDate } from 'src/app/core/utils/date.utils';
 import { ReservationService } from 'src/app/core/services/reservation.service';
 import { RoomService } from 'src/app/core/services/room.service';
@@ -53,7 +54,8 @@ export class ReservationFormComponent implements OnInit {
     private router: Router,
     private reservationService: ReservationService,
     private roomService: RoomService,
-    private guestService: GuestService
+    private guestService: GuestService,
+    private notificationService: NotificationService
   ) {
     this.guestOptions$ = this.form.controls.guest.valueChanges.pipe(
       debounceTime(SEARCH_DEBOUNCE_MS),
@@ -129,7 +131,10 @@ export class ReservationFormComponent implements OnInit {
     this.isSaving = true;
     request$
       .pipe(finalize(() => this.isSaving = false))
-      .subscribe(() => this.router.navigate(['/reservations']));
+      .subscribe(() => {
+        this.notificationService.success('Zapisano rezerwację.');
+        this.router.navigate(['/reservations']);
+      });
   }
 
   private loadAvailableRooms(): void {
