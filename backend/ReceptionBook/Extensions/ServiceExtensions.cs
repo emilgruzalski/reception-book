@@ -20,15 +20,20 @@ public static class ServiceExtensions
 {
     private const int HstsMaxAgeInDays = 365;
 
-    public static void ConfigureCors(this IServiceCollection services) =>
+    public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
+    {
+        var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+                             ?? Array.Empty<string>();
+
         services.AddCors(options =>
         {
             options.AddPolicy("CorsPolicy", builder =>
-                builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
+                builder.WithOrigins(allowedOrigins)
+                    .WithMethods("GET", "POST", "PUT", "DELETE")
+                    .WithHeaders("Content-Type", "Authorization")
                     .WithExposedHeaders("X-Pagination"));
         });
+    }
 
     public static void ConfigureIISIntegration(this IServiceCollection services) =>
         services.Configure<IISOptions>(options =>

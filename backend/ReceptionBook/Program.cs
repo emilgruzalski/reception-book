@@ -13,7 +13,7 @@ builder.WebHost.ConfigureKestrel(options => options.AddServerHeader = false);
 
 LogManager.Setup().LoadConfigurationFromFile(Path.Combine(Directory.GetCurrentDirectory(), "nlog.config"));
 
-builder.Services.ConfigureCors();
+builder.Services.ConfigureCors(builder.Configuration);
 builder.Services.ConfigureIISIntegration();
 builder.Services.ConfigureHsts();
 builder.Services.ConfigureLoggerService();
