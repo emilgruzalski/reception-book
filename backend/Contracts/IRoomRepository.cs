@@ -9,6 +9,7 @@ public interface IRoomRepository
     Task<Room?> GetRoomAsync(Guid roomId, bool trackChanges);
     Task<IEnumerable<Room>> GetAvailableRoomsAsync(DateTime checkInDate, DateTime checkOutDate, int numberOfGuests,
         bool trackChanges);
+    Task<Dictionary<RoomStatus, int>> GetRoomStatusCountsAsync();
     Task<bool> RoomNumberExistsAsync(string number, Guid? excludedRoomId = null);
     void CreateRoom(Room room);
     void DeleteRoom(Room room);

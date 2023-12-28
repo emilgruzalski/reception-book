@@ -7,4 +7,5 @@ public interface IServiceManager
     IReservationService ReservationService { get; }
     IAuthenticationService AuthenticationService { get; }
     IUserService UserService { get; }
+    IDashboardService DashboardService { get; }
 }

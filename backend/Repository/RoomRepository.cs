@@ -37,6 +37,12 @@ public class RoomRepository : RepositoryBase<Room>, IRoomRepository
             .OrderBy(r => r.Number)
             .ToListAsync();
 
+    public async Task<Dictionary<RoomStatus, int>> GetRoomStatusCountsAsync() =>
+        await FindAll(trackChanges: false)
+            .GroupBy(r => r.Status)
+            .Select(g => new { Status = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.Status, x => x.Count);
+
     public async Task<bool> RoomNumberExistsAsync(string number, Guid? excludedRoomId = null) =>
         await FindByCondition(r => r.Number == number && r.Id != excludedRoomId, trackChanges: false)
             .AnyAsync();

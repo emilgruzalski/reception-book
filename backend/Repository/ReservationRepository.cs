@@ -38,6 +38,30 @@ public class ReservationRepository : RepositoryBase<Reservation>, IReservationRe
                 trackChanges: false)
             .AnyAsync();
 
+    public async Task<IEnumerable<Reservation>> GetArrivalsAsync(DateTime date) =>
+        await FindByCondition(r =>
+                r.CheckInDate == date.Date &&
+                (r.Status == ReservationStatus.Confirmed || r.Status == ReservationStatus.CheckedIn),
+                trackChanges: false)
+            .Include(r => r.Room)
+            .Include(r => r.Guest)
+            .OrderBy(r => r.Room!.Number)
+            .ToListAsync();
+
+    public async Task<IEnumerable<Reservation>> GetDeparturesAsync(DateTime date) =>
+        await FindByCondition(r =>
+                r.CheckOutDate == date.Date &&
+                (r.Status == ReservationStatus.CheckedIn || r.Status == ReservationStatus.CheckedOut),
+                trackChanges: false)
+            .Include(r => r.Room)
+            .Include(r => r.Guest)
+            .OrderBy(r => r.Room!.Number)
+            .ToListAsync();
+
+    public async Task<int> GetGuestsInHouseCountAsync() =>
+        await FindByCondition(r => r.Status == ReservationStatus.CheckedIn, trackChanges: false)
+            .SumAsync(r => r.NumberOfGuests);
+
     public async Task<bool> AnyForRoomAsync(Guid roomId) =>
         await FindByCondition(r => r.RoomId.Equals(roomId), trackChanges: false).AnyAsync();
 

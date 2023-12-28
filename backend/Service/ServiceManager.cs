@@ -15,6 +15,7 @@ public sealed class ServiceManager : IServiceManager
     private readonly Lazy<IReservationService> _reservationService;
     private readonly Lazy<IAuthenticationService> _authenticationService;
     private readonly Lazy<IUserService> _userService;
+    private readonly Lazy<IDashboardService> _dashboardService;
 
     public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger, IMapper mapper,
         UserManager<User> userManager, IOptions<JwtConfiguration> configuration)
@@ -25,6 +26,7 @@ public sealed class ServiceManager : IServiceManager
         _authenticationService = new Lazy<IAuthenticationService>(() =>
             new AuthenticationService(logger, mapper, userManager, configuration));
         _userService = new Lazy<IUserService>(() => new UserService(logger, mapper, userManager));
+        _dashboardService = new Lazy<IDashboardService>(() => new DashboardService(repositoryManager, mapper));
     }
 
     public IRoomService RoomService => _roomService.Value;
@@ -32,4 +34,5 @@ public sealed class ServiceManager : IServiceManager
     public IReservationService ReservationService => _reservationService.Value;
     public IAuthenticationService AuthenticationService => _authenticationService.Value;
     public IUserService UserService => _userService.Value;
+    public IDashboardService DashboardService => _dashboardService.Value;
 }
