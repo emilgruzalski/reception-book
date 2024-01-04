@@ -38,7 +38,7 @@ builder.Services.AddControllers()
     .AddApplicationPart(typeof(ReceptionBook.Presentation.AssemblyReference).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.ConfigureSwagger();
 
 var app = builder.Build();
 
@@ -56,7 +56,7 @@ app.UseMiddleware<SecurityHeadersMiddleware>();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(s => s.SwaggerEndpoint("/swagger/v1/swagger.json", "ReceptionBook API v1"));
 }
 else
 {

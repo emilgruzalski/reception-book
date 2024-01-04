@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using Repository;
 using Service;
 using Service.Contracts;
@@ -153,6 +154,42 @@ public static class ServiceExtensions
             };
         });
     }
+
+    public static void ConfigureSwagger(this IServiceCollection services) =>
+        services.AddSwaggerGen(s =>
+        {
+            s.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "ReceptionBook API",
+                Version = "v1",
+                Description = "REST API for the ReceptionBook hotel reception system."
+            });
+
+            s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Enter the JWT access token.",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT"
+            });
+
+            s.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
 
     private static string GetClientIpAddress(HttpContext context) =>
         context.Connection.RemoteIpAddress?.ToString() ?? "unknown";
