@@ -11,6 +11,8 @@ public class RepositoryContextFactory : IDesignTimeDbContextFactory<RepositoryCo
         var configuration = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json")
+            .AddUserSecrets<RepositoryContextFactory>(optional: true)
+            .AddEnvironmentVariables()
             .Build();
 
         var builder = new DbContextOptionsBuilder<RepositoryContext>()

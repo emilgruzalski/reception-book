@@ -478,3 +478,6 @@ $RECYCLE.BIN/
 
 # NLog internal logs
 internal_logs/
+
+# Local environment files with secrets
+.env

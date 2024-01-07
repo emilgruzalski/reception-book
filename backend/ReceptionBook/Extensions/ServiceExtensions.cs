@@ -20,6 +20,7 @@ namespace ReceptionBook.Extensions;
 public static class ServiceExtensions
 {
     private const int HstsMaxAgeInDays = 365;
+    private const int MinimumSecretKeyLengthInBytes = 32;
 
     public static void ConfigureCors(this IServiceCollection services, IConfiguration configuration)
     {
@@ -88,6 +89,15 @@ public static class ServiceExtensions
         var jwtConfiguration = new JwtConfiguration();
         configuration.Bind(jwtConfiguration.Section, jwtConfiguration);
 
+        // HMAC-SHA256 requires a key of at least 256 bits. Fail fast instead of issuing weak tokens.
+        if (string.IsNullOrWhiteSpace(jwtConfiguration.SecretKey) ||
+            Encoding.UTF8.GetByteCount(jwtConfiguration.SecretKey) < MinimumSecretKeyLengthInBytes)
+        {
+            throw new InvalidOperationException(
+                $"JWT secret key is missing or shorter than {MinimumSecretKeyLengthInBytes} bytes. " +
+                "Set 'JwtSettings:SecretKey' in user secrets or the 'JwtSettings__SecretKey' environment variable.");
+        }
+
         services.AddAuthentication(opt =>
             {
                 opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -103,7 +113,7 @@ public static class ServiceExtensions
                     ValidateIssuerSigningKey = true,
                     ValidIssuer = jwtConfiguration.ValidIssuer,
                     ValidAudience = jwtConfiguration.ValidAudience,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.SecretKey!)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfiguration.SecretKey)),
                     ClockSkew = TimeSpan.Zero
                 };
             });
