@@ -129,6 +129,27 @@ internal sealed class AuthenticationService : IAuthenticationService
         await _userManager.UpdateAsync(user);
     }
 
+    public async Task<IdentityResult> ChangePassword(string userName, PasswordChangeDto passwordChange)
+    {
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user is null)
+            throw new UserNotFoundException(userName);
+
+        var result = await _userManager.ChangePasswordAsync(user, passwordChange.CurrentPassword!,
+            passwordChange.NewPassword!);
+        if (!result.Succeeded)
+            return result;
+
+        // Sign out other sessions by invalidating the stored refresh token.
+        user.RefreshToken = null;
+        user.RefreshTokenExpiryTime = DateTime.MinValue;
+        await _userManager.UpdateAsync(user);
+
+        _logger.LogInfo($"User '{userName}' has changed the password.");
+
+        return result;
+    }
+
     private SigningCredentials GetSigningCredentials()
     {
         var key = Encoding.UTF8.GetBytes(_jwtConfiguration.SecretKey!);

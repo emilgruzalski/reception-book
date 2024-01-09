@@ -47,4 +47,21 @@ public class AuthenticationController : ControllerBase
 
         return Ok(tokenDto);
     }
+
+    [HttpPost("change-password")]
+    [Authorize]
+    [ServiceFilter(typeof(ValidationFilterAttribute))]
+    public async Task<IActionResult> ChangePassword([FromBody] PasswordChangeDto passwordChange)
+    {
+        var result = await _service.AuthenticationService.ChangePassword(User.Identity!.Name!, passwordChange);
+        if (!result.Succeeded)
+        {
+            foreach (var error in result.Errors)
+                ModelState.TryAddModelError(error.Code, error.Description);
+
+            return BadRequest(ModelState);
+        }
+
+        return NoContent();
+    }
 }
