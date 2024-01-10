@@ -5,7 +5,7 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { BehaviorSubject, catchError, map, Observable, of, tap, throwError } from 'rxjs';
 
 import { environment } from 'src/environments/environment';
-import { CurrentUser, LoginRequest, TokenResponse } from '../models/auth.model';
+import { CurrentUser, LoginRequest, PasswordChange, TokenResponse } from '../models/auth.model';
 
 const ACCESS_TOKEN_KEY = 'accessToken';
 const REFRESH_TOKEN_KEY = 'refreshToken';
@@ -55,6 +55,10 @@ export class AuthService {
     return this.http.post<TokenResponse>(`${this.tokenUrl}/refresh`, { accessToken, refreshToken }).pipe(
       tap(tokens => this.storeTokens(tokens))
     );
+  }
+
+  changePassword(passwordChange: PasswordChange): Observable<void> {
+    return this.http.post<void>(`${this.url}/change-password`, passwordChange);
   }
 
   /** Revokes the refresh token on the server, so it cannot be used after logging out. */

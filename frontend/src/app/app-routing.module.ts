@@ -34,6 +34,10 @@ const routes: Routes = [
         loadChildren: () => import('./features/reservations/reservations.module').then(m => m.ReservationsModule)
       },
       {
+        path: 'account',
+        loadChildren: () => import('./features/account/account.module').then(m => m.AccountModule)
+      },
+      {
         path: 'users',
         canActivate: [roleGuard],
         data: { roles: ADMINISTRATOR_ONLY },

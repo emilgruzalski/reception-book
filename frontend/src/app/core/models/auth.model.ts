@@ -23,3 +23,9 @@ export interface CurrentUser {
 }
 
 export const ADMINISTRATOR_ONLY: readonly UserRole[] = [UserRoles.Administrator];
+
+export interface PasswordChange {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
