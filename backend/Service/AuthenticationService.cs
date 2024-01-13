@@ -92,7 +92,8 @@ internal sealed class AuthenticationService : IAuthenticationService
 
         var refreshToken = GenerateRefreshToken();
 
-        _user!.RefreshToken = refreshToken;
+        // Only a hash of the refresh token is stored, so a database leak does not expose valid tokens.
+        _user!.RefreshToken = HashToken(refreshToken);
         if (populateExp)
             _user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(_jwtConfiguration.RefreshTokenExpiresInDays);
 
@@ -108,8 +109,7 @@ internal sealed class AuthenticationService : IAuthenticationService
         var principal = GetPrincipalFromExpiredToken(tokenDto.AccessToken);
 
         var user = await _userManager.FindByNameAsync(principal.Identity!.Name!);
-        if (user == null || user.RefreshToken != tokenDto.RefreshToken ||
-            user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+        if (user == null || !IsRefreshTokenValid(user, tokenDto.RefreshToken))
             throw new RefreshTokenBadRequestException();
 
         _user = user;
@@ -181,6 +181,21 @@ internal sealed class AuthenticationService : IAuthenticationService
             claims: claims,
             expires: DateTime.UtcNow.AddMinutes(_jwtConfiguration.ExpiresInMinutes),
             signingCredentials: signingCredentials);
+
+    private static string HashToken(string token) =>
+        Convert.ToBase64String(SHA256.HashData(Encoding.UTF8.GetBytes(token)));
+
+    private static bool IsRefreshTokenValid(User user, string refreshToken)
+    {
+        if (string.IsNullOrEmpty(user.RefreshToken) || user.RefreshTokenExpiryTime <= DateTime.UtcNow)
+            return false;
+
+        var storedHash = Encoding.UTF8.GetBytes(user.RefreshToken);
+        var providedHash = Encoding.UTF8.GetBytes(HashToken(refreshToken));
+
+        // Constant-time comparison prevents timing attacks on the token value.
+        return CryptographicOperations.FixedTimeEquals(storedHash, providedHash);
+    }
 
     private static string GenerateRefreshToken()
     {
