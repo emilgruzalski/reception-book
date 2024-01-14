@@ -6,7 +6,7 @@
       <mat-label>Numer pokoju</mat-label>
       <input matInput formControlName="number" required>
       <mat-error *ngIf="form.controls.number.hasError('required')">Numer pokoju jest wymagany.</mat-error>
-      <mat-error *ngIf="form.controls.number.hasError('maxlength')">Numer może mieć maksymalnie 10 znaków.</mat-error>
+      <mat-error *ngIf="form.controls.number.hasError('pattern')">Numer może zawierać litery, cyfry i myślnik (maks. 10 znaków).</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">

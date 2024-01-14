@@ -17,6 +17,9 @@
         <mat-datepicker-toggle matIconSuffix [for]="stayPicker"></mat-datepicker-toggle>
         <mat-date-range-picker #stayPicker></mat-date-range-picker>
         <mat-error>Wybierz datę przyjazdu i wyjazdu.</mat-error>
+        <mat-hint class="hint-error" *ngIf="form.hasError('invalidDateRange')">
+          Pobyt musi trwać co najmniej jedną noc.
+        </mat-hint>
       </mat-form-field>
 
       <mat-form-field appearance="outline">

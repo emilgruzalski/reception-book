@@ -13,6 +13,7 @@ import { NotificationService } from 'src/app/core/services/notification.service'
 import { fromApiDate, toApiDate } from 'src/app/core/utils/date.utils';
 import { ReservationService } from 'src/app/core/services/reservation.service';
 import { RoomService } from 'src/app/core/services/room.service';
+import { dateRangeValidator } from 'src/app/shared/validators/form.validators';
 
 const GUEST_SUGGESTIONS_COUNT = 10;
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
@@ -37,7 +38,7 @@ export class ReservationFormComponent implements OnInit {
     roomId: ['', Validators.required],
     guest: [null as Guest | string | null, guestSelectedValidator],
     notes: ['', Validators.maxLength(500)]
-  });
+  }, { validators: dateRangeValidator('checkInDate', 'checkOutDate') });
 
   readonly guestOptions$: Observable<Guest[]>;
 

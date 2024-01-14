@@ -17,12 +17,14 @@
     <mat-form-field appearance="outline">
       <mat-label>Numer dokumentu</mat-label>
       <input matInput formControlName="documentNumber" required>
-      <mat-error>Numer dokumentu jest wymagany.</mat-error>
+      <mat-error *ngIf="form.controls.documentNumber.hasError('required')">Numer dokumentu jest wymagany.</mat-error>
+      <mat-error *ngIf="form.controls.documentNumber.hasError('pattern')">Numer dokumentu może zawierać tylko litery i cyfry (5–30 znaków).</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
       <mat-label>Telefon</mat-label>
-      <input matInput type="tel" formControlName="phoneNumber">
+      <input matInput type="tel" formControlName="phoneNumber" placeholder="+48 600 100 200">
+      <mat-error>Podaj poprawny numer telefonu.</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">

@@ -5,6 +5,7 @@ import { finalize, Observable } from 'rxjs';
 
 import { Guest } from 'src/app/core/models/guest.model';
 import { GuestService } from 'src/app/core/services/guest.service';
+import { DOCUMENT_NUMBER_PATTERN, PHONE_PATTERN } from 'src/app/shared/validators/form.validators';
 
 export interface GuestFormDialogData {
   guest?: Guest;
@@ -20,9 +21,9 @@ export class GuestFormDialogComponent {
   readonly form = this.fb.nonNullable.group({
     firstName: ['', [Validators.required, Validators.maxLength(50)]],
     lastName: ['', [Validators.required, Validators.maxLength(50)]],
-    documentNumber: ['', [Validators.required, Validators.maxLength(30)]],
+    documentNumber: ['', [Validators.required, Validators.pattern(DOCUMENT_NUMBER_PATTERN)]],
     email: ['', [Validators.email, Validators.maxLength(100)]],
-    phoneNumber: ['', Validators.maxLength(20)],
+    phoneNumber: ['', Validators.pattern(PHONE_PATTERN)],
     address: ['', Validators.maxLength(200)]
   });
 

@@ -5,6 +5,7 @@ import { finalize, Observable } from 'rxjs';
 
 import { Room, ROOM_STATUSES, ROOM_TYPES, RoomStatus, RoomType } from 'src/app/core/models/room.model';
 import { RoomService } from 'src/app/core/services/room.service';
+import { ROOM_NUMBER_PATTERN } from 'src/app/shared/validators/form.validators';
 
 export interface RoomFormDialogData {
   room?: Room;
@@ -21,7 +22,7 @@ export class RoomFormDialogComponent {
   readonly isEditMode: boolean;
 
   readonly form = this.fb.nonNullable.group({
-    number: ['', [Validators.required, Validators.maxLength(10)]],
+    number: ['', [Validators.required, Validators.pattern(ROOM_NUMBER_PATTERN)]],
     floor: [0, [Validators.required, Validators.min(0), Validators.max(50)]],
     type: ['Single' as RoomType, Validators.required],
     capacity: [1, [Validators.required, Validators.min(1), Validators.max(10)]],
