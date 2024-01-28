@@ -66,7 +66,7 @@ internal sealed class ReservationService : IReservationService
         var reservation = await GetReservationAndCheckIfItExists(reservationId, trackChanges);
         var room = await GetRoomAndCheckIfItExists(reservationForUpdate.RoomId!.Value);
         await CheckIfGuestExists(reservationForUpdate.GuestId!.Value);
-        await ValidateReservation(room, reservationForUpdate);
+        await ValidateReservation(room, reservationForUpdate, reservationId);
 
         _mapper.Map(reservationForUpdate, reservation);
         reservation.CheckInDate = reservation.CheckInDate.Date;
@@ -129,7 +129,8 @@ internal sealed class ReservationService : IReservationService
         await _repository.SaveAsync();
     }
 
-    private async Task ValidateReservation(Room room, ReservationForManipulationDto reservation)
+    private async Task ValidateReservation(Room room, ReservationForManipulationDto reservation,
+        Guid? reservationId = null)
     {
         var checkInDate = reservation.CheckInDate!.Value.Date;
         var checkOutDate = reservation.CheckOutDate!.Value.Date;
@@ -140,7 +141,9 @@ internal sealed class ReservationService : IReservationService
         if (reservation.NumberOfGuests > room.Capacity)
             throw new RoomCapacityExceededBadRequestException(room.Number!, room.Capacity);
 
-        if (await _repository.Reservation.HasOverlappingReservationAsync(room.Id, checkInDate, checkOutDate))
+        // The reservation being updated must not be treated as a conflict with itself.
+        if (await _repository.Reservation.HasOverlappingReservationAsync(room.Id, checkInDate, checkOutDate,
+                reservationId))
             throw new RoomNotAvailableBadRequestException(room.Number!);
     }
 

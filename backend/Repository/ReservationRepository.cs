@@ -29,9 +29,10 @@ public class ReservationRepository : RepositoryBase<Reservation>, IReservationRe
             .SingleOrDefaultAsync();
 
     public async Task<bool> HasOverlappingReservationAsync(Guid roomId, DateTime checkInDate,
-        DateTime checkOutDate) =>
+        DateTime checkOutDate, Guid? excludedReservationId = null) =>
         await FindByCondition(r =>
                 r.RoomId.Equals(roomId) &&
+                r.Id != excludedReservationId &&
                 r.Status != ReservationStatus.Cancelled &&
                 r.CheckInDate < checkOutDate &&
                 r.CheckOutDate > checkInDate,
