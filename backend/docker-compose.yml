@@ -1,0 +1,31 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql
+
+  api:
+    build: .
+    depends_on:
+      - db
+    # The API exits when the database is not ready yet, so let Docker start it again.
+    restart: on-failure
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__sqlConnection: "Server=db;Database=ReceptionBook;User Id=sa;Password=${DB_PASSWORD};TrustServerCertificate=True"
+      JwtSettings__SecretKey: ${JWT_SECRET_KEY}
+      AdministratorAccount__UserName: admin
+      AdministratorAccount__Email: admin@receptionbook.local
+      AdministratorAccount__Password: ${ADMIN_PASSWORD}
+      Database__MigrateOnStartup: "true"
+      Cors__AllowedOrigins__0: ${FRONTEND_ORIGIN:-http://localhost:4200}
+    ports:
+      - "5000:8080"
+
+volumes:
+  sqldata:

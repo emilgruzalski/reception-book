@@ -1,0 +1,11 @@
+**/bin/
+**/obj/
+**/logs/
+**/internal_logs/
+**/*.user
+.git/
+.vs/
+.vscode/
+.idea/
+.env
+ReceptionBook.Tests/

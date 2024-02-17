@@ -74,6 +74,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+await app.MigrateDatabaseAsync();
 await app.SeedAdministratorAsync();
 
 app.Run();
