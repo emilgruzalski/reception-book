@@ -1,11 +1,13 @@
 server {
     listen 80;
     server_name _;
+    server_tokens off;
 
     root /usr/share/nginx/html;
     index index.html;
 
     # The API is served from the same origin, so the browser does not need CORS.
+    # Security headers for API responses are set by the backend.
     location /api/ {
         proxy_pass ${API_URL}/api/;
         proxy_set_header Host $host;
@@ -16,5 +18,12 @@ server {
     # Angular routes are handled in the browser.
     location / {
         try_files $uri $uri/ /index.html;
+
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-Frame-Options "DENY" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Permissions-Policy "camera=(), microphone=(), geolocation=()" always;
+        # Scripts may only come from our origin. Inline styles are still needed by Angular Material.
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'" always;
     }
 }
