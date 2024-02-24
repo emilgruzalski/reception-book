@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using ReceptionBook.Extensions;
 using ReceptionBook.Middleware;
 using ReceptionBook.Presentation.ActionFilters;
+using Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,9 @@ builder.Services.AddControllers()
     .AddJsonOptions(options =>
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()))
     .AddApplicationPart(typeof(ReceptionBook.Presentation.AssemblyReference).Assembly);
+
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<RepositoryContext>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.ConfigureSwagger();
@@ -73,6 +77,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 await app.MigrateDatabaseAsync();
 await app.SeedAdministratorAsync();
