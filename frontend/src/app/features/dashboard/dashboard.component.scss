@@ -35,6 +35,6 @@ $list-min-width: 420px;
 
 .lists {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax($list-min-width, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, $list-min-width), 1fr));
   gap: 24px;
 }

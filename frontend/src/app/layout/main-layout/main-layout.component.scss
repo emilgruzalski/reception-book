@@ -1,6 +1,8 @@
 $toolbar-height: 64px;
 $sidenav-width: 230px;
 $content-padding: 24px;
+$content-padding-handset: 12px;
+$handset-max-width: 599.98px;
 
 :host {
   display: block;
@@ -41,6 +43,10 @@ $content-padding: 24px;
 
 .content {
   padding: $content-padding;
+
+  @media (max-width: $handset-max-width) {
+    padding: $content-padding-handset;
+  }
 }
 
 .active-link {

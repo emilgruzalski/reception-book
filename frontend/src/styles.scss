@@ -1,5 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
+$handset-max-width: 599.98px;
+
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
@@ -78,5 +80,19 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   &.snackbar-error {
     --mdc-snackbar-container-color: #c62828;
     --mat-mdc-snack-bar-button-color: #fff;
+  }
+}
+
+@media (max-width: $handset-max-width) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-wrap: wrap;
+  }
+
+  .filters .search-field {
+    max-width: none;
   }
 }

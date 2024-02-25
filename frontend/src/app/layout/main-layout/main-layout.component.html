@@ -7,7 +7,7 @@
   <ng-container *ngIf="currentUser$ | async as user">
     <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
       <mat-icon>account_circle</mat-icon>
-      <span class="user-name">{{ user.firstName }} {{ user.lastName }}</span>
+      <span class="user-name" *ngIf="!isHandset">{{ user.firstName }} {{ user.lastName }}</span>
     </button>
     <mat-menu #userMenu="matMenu" xPosition="before">
       <a mat-menu-item routerLink="/account/change-password">
@@ -23,8 +23,8 @@
 </mat-toolbar>
 
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #sidenav mode="side" opened class="sidenav">
-    <mat-nav-list>
+  <mat-sidenav #sidenav class="sidenav" [mode]="isHandset ? 'over' : 'side'" [opened]="!isHandset">
+    <mat-nav-list (click)="closeOnHandset(sidenav)">
       <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
         <mat-icon matListItemIcon>dashboard</mat-icon>
         <span matListItemTitle>Pulpit</span>
