@@ -1,27 +1,69 @@
-# ReceptionBook
+# ReceptionBook – Frontend
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 16.1.1.
+Angular client for **ReceptionBook**, a web application for hotel reception staff.
 
-## Development server
+The project was created as part of the engineering thesis
+*„Architektura i bezpieczeństwo nowoczesnych aplikacji internetowych na przykładzie aplikacji ReceptionBook”*.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+The REST API lives in the [ReceptionBook-Backend](https://github.com/emilgruzalski/ReceptionBook-Backend) repository.
 
-## Code scaffolding
+## Features
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- Dashboard with today's arrivals and departures, room status and occupancy
+- Rooms, guests and reservations with server-side paging, sorting, filtering and search
+- Reservation form that shows only rooms available in the selected period
+- Check-in, check-out and cancellation of reservations
+- User management for administrators and password change for every user
+- Polish user interface (dates, currency, paginator)
 
-## Build
+## Security
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+- JWT access token sent only to the application API by an HTTP interceptor
+- Automatic token refresh after `401 Unauthorized`; concurrent requests wait for a single refresh
+- Refresh token revoked on the server when the user logs out
+- Route guards (`authGuard`, `roleGuard`) and the `*appHasRole` directive – the API enforces the same rules
+- Open redirect protection of the `returnUrl` after login
+- Angular template sanitization – no `innerHTML` and no `bypassSecurityTrust*` calls
+- nginx with `Content-Security-Policy` (`script-src 'self'`), `X-Frame-Options`, `X-Content-Type-Options` and `Referrer-Policy`
 
-## Running unit tests
+## Tech stack
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Angular 16, Angular Material 16, RxJS, `@auth0/angular-jwt`, Jasmine and Karma, nginx, Docker.
 
-## Running end-to-end tests
+## Getting started
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+Requirements: Node.js 18 and a running [backend](https://github.com/emilgruzalski/ReceptionBook-Backend).
 
-## Further help
+```bash
+npm ci
+npm start
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+The application is available at <http://localhost:4200>. In development it calls the API at
+`https://localhost:7285/api` (see `src/environments/environment.development.ts`).
+
+## Tests
+
+```bash
+npm test          # watch mode in Chrome
+npm run test:ci   # single run in headless Chrome
+```
+
+## Docker
+
+The production build is served by nginx, which also forwards `/api` requests to the backend:
+
+```bash
+docker build -t receptionbook-web .
+docker run -p 4200:80 -e API_URL=http://host.docker.internal:8080 receptionbook-web
+```
+
+## Project structure
+
+```
+src/app
+├── core        # models, services, interceptors, guards and utilities
+├── shared      # Material modules, pipes, directives, validators and common components
+├── layout      # main layout with toolbar and navigation
+└── features    # lazy-loaded modules: dashboard, rooms, guests, reservations, users, account, auth
+```
