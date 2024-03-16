@@ -25,12 +25,16 @@ public static class ExceptionMiddlewareExtensions
                         _ => StatusCodes.Status500InternalServerError
                     };
 
-                    logger.LogError($"Something went wrong: {contextFeature.Error}");
+                    var isServerError = context.Response.StatusCode == StatusCodes.Status500InternalServerError;
+
+                    // Expected client errors are logged without a stack trace to keep the logs readable.
+                    if (isServerError)
+                        logger.LogError($"Something went wrong: {contextFeature.Error}");
+                    else
+                        logger.LogWarn($"{context.Request.Method} {context.Request.Path} failed: {contextFeature.Error.Message}");
 
                     // Do not expose internal error details to the client.
-                    var message = context.Response.StatusCode == StatusCodes.Status500InternalServerError
-                        ? "Internal Server Error."
-                        : contextFeature.Error.Message;
+                    var message = isServerError ? "Internal Server Error." : contextFeature.Error.Message;
 
                     await context.Response.WriteAsync(new ErrorDetails
                     {
