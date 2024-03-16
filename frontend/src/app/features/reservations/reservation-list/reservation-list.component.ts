@@ -56,8 +56,10 @@ export class ReservationListComponent implements OnInit {
       debounceTime(SEARCH_DEBOUNCE_MS),
       takeUntilDestroyed()
     ).subscribe(filters => {
+      // Filters change the number of results, so always go back to the first page.
       this.query = {
         ...this.query,
+        pageNumber: 1,
         searchTerm: filters.searchTerm ?? undefined,
         status: filters.status ?? undefined,
         fromDate: filters.fromDate ? toApiDate(filters.fromDate) : undefined,

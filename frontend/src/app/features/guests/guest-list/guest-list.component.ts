@@ -40,7 +40,8 @@ export class GuestListComponent implements OnInit {
       distinctUntilChanged(),
       takeUntilDestroyed()
     ).subscribe(searchTerm => {
-      this.query = { ...this.query, searchTerm };
+      // Filters change the number of results, so always go back to the first page.
+      this.query = { ...this.query, pageNumber: 1, searchTerm };
       this.loadGuests();
     });
   }

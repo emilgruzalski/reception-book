@@ -50,8 +50,10 @@ export class RoomListComponent implements OnInit {
       debounceTime(SEARCH_DEBOUNCE_MS),
       takeUntilDestroyed()
     ).subscribe(filters => {
+      // Filters change the number of results, so always go back to the first page.
       this.query = {
         ...this.query,
+        pageNumber: 1,
         searchTerm: filters.searchTerm ?? undefined,
         type: filters.type ?? undefined,
         status: filters.status ?? undefined
