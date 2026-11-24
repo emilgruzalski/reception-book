@@ -1,0 +1,37 @@
+<div class="login-page">
+  <mat-card class="login-card">
+    <mat-card-header>
+      <mat-card-title>ReceptionBook</mat-card-title>
+      <mat-card-subtitle>Zaloguj się, aby kontynuować</mat-card-subtitle>
+    </mat-card-header>
+
+    <form [formGroup]="form" (ngSubmit)="login()">
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nazwa użytkownika</mat-label>
+          <input matInput formControlName="userName" autocomplete="username" required>
+          <mat-error>Podaj nazwę użytkownika.</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Hasło</mat-label>
+          <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password"
+                 autocomplete="current-password" required>
+          <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword"
+                  [attr.aria-label]="hidePassword ? 'Pokaż hasło' : 'Ukryj hasło'">
+            <mat-icon>{{ hidePassword ? 'visibility' : 'visibility_off' }}</mat-icon>
+          </button>
+          <mat-error>Podaj hasło.</mat-error>
+        </mat-form-field>
+
+        <p class="error-message" *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
+      </mat-card-content>
+
+      <mat-card-actions>
+        <button mat-flat-button color="primary" type="submit" class="full-width" [disabled]="isSubmitting">
+          Zaloguj
+        </button>
+      </mat-card-actions>
+    </form>
+  </mat-card>
+</div>

@@ -1,0 +1,40 @@
+$stat-min-width: 180px;
+$list-min-width: 420px;
+
+.today {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($stat-min-width, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 16px;
+
+  mat-icon {
+    color: #3f51b5;
+  }
+}
+
+.stat-value {
+  font-size: 32px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.stat-label {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.lists {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, $list-min-width), 1fr));
+  gap: 24px;
+}

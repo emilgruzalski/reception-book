@@ -1,0 +1,54 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Edytuj pokój' : 'Nowy pokój' }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="save()">
+  <mat-dialog-content class="form-grid">
+    <mat-form-field appearance="outline">
+      <mat-label>Numer pokoju</mat-label>
+      <input matInput formControlName="number" required>
+      <mat-error *ngIf="form.controls.number.hasError('required')">Numer pokoju jest wymagany.</mat-error>
+      <mat-error *ngIf="form.controls.number.hasError('pattern')">Numer może zawierać litery, cyfry i myślnik (maks. 10 znaków).</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Piętro</mat-label>
+      <input matInput type="number" formControlName="floor" min="0" max="50" required>
+      <mat-error>Piętro musi być liczbą od 0 do 50.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Typ pokoju</mat-label>
+      <mat-select formControlName="type" required>
+        <mat-option *ngFor="let type of roomTypes" [value]="type">{{ type | roomType }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Liczba osób</mat-label>
+      <input matInput type="number" formControlName="capacity" min="1" max="10" required>
+      <mat-error>Liczba osób musi być od 1 do 10.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Cena za noc (PLN)</mat-label>
+      <input matInput type="number" formControlName="pricePerNight" min="1" required>
+      <mat-error>Podaj poprawną cenę.</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" *ngIf="isEditMode">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option *ngFor="let status of roomStatuses" [value]="status">{{ status | roomStatus }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Opis</mat-label>
+      <textarea matInput formControlName="description" rows="3" maxlength="500"></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button type="button" mat-dialog-close>Anuluj</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="isSaving">Zapisz</button>
+  </mat-dialog-actions>
+</form>

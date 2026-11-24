@@ -1,0 +1,123 @@
+<div class="page-header">
+  <h1>Rezerwacje</h1>
+  <a mat-flat-button color="primary" routerLink="new">
+    <mat-icon>add</mat-icon>
+    Nowa rezerwacja
+  </a>
+</div>
+
+<form class="filters" [formGroup]="filtersForm">
+  <mat-form-field appearance="outline" class="search-field">
+    <mat-label>Szukaj</mat-label>
+    <input matInput formControlName="searchTerm" placeholder="Nazwisko gościa lub numer pokoju">
+    <mat-icon matSuffix>search</mat-icon>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Status</mat-label>
+    <mat-select formControlName="status">
+      <mat-option [value]="null">Wszystkie</mat-option>
+      <mat-option *ngFor="let status of reservationStatuses" [value]="status">{{ status | reservationStatus }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Okres pobytu</mat-label>
+    <mat-date-range-input [rangePicker]="rangePicker">
+      <input matStartDate formControlName="fromDate" placeholder="Od">
+      <input matEndDate formControlName="toDate" placeholder="Do">
+    </mat-date-range-input>
+    <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+    <mat-date-range-picker #rangePicker></mat-date-range-picker>
+  </mat-form-field>
+</form>
+
+<div class="table-container mat-elevation-z2">
+  <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+
+  <table mat-table [dataSource]="reservations" matSort matSortActive="checkInDate" matSortDirection="desc"
+         matSortDisableClear (matSortChange)="onSortChange($event)">
+    <ng-container matColumnDef="guestFullName">
+      <th mat-header-cell *matHeaderCellDef>Gość</th>
+      <td mat-cell *matCellDef="let reservation">{{ reservation.guestFullName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="roomNumber">
+      <th mat-header-cell *matHeaderCellDef>Pokój</th>
+      <td mat-cell *matCellDef="let reservation">{{ reservation.roomNumber }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="checkInDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Przyjazd</th>
+      <td mat-cell *matCellDef="let reservation">{{ reservation.checkInDate | date:'dd.MM.yyyy' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="checkOutDate">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Wyjazd</th>
+      <td mat-cell *matCellDef="let reservation">{{ reservation.checkOutDate | date:'dd.MM.yyyy' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="numberOfGuests">
+      <th mat-header-cell *matHeaderCellDef>Osoby</th>
+      <td mat-cell *matCellDef="let reservation">{{ reservation.numberOfGuests }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="totalPrice">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Kwota</th>
+      <td mat-cell *matCellDef="let reservation">{{ reservation.totalPrice | currency:'PLN' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+      <td mat-cell *matCellDef="let reservation">
+        <span class="status status-{{ reservation.status | lowercase }}">{{ reservation.status | reservationStatus }}</span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let reservation" class="actions-cell">
+        <ng-container [ngSwitch]="reservation.status">
+          <ng-container *ngSwitchCase="'Confirmed'">
+            <button mat-icon-button color="primary" matTooltip="Zamelduj" (click)="checkIn(reservation)">
+              <mat-icon>login</mat-icon>
+            </button>
+            <a mat-icon-button matTooltip="Edytuj" [routerLink]="[reservation.id, 'edit']">
+              <mat-icon>edit</mat-icon>
+            </a>
+            <button mat-icon-button matTooltip="Anuluj rezerwację" (click)="cancel(reservation)">
+              <mat-icon>event_busy</mat-icon>
+            </button>
+          </ng-container>
+          <ng-container *ngSwitchCase="'CheckedIn'">
+            <button mat-icon-button color="primary" matTooltip="Wymelduj" (click)="checkOut(reservation)">
+              <mat-icon>logout</mat-icon>
+            </button>
+            <a mat-icon-button matTooltip="Edytuj" [routerLink]="[reservation.id, 'edit']">
+              <mat-icon>edit</mat-icon>
+            </a>
+          </ng-container>
+        </ng-container>
+        <button mat-icon-button color="warn" matTooltip="Usuń" (click)="deleteReservation(reservation)"
+                *appHasRole="administratorOnly">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    <tr class="mat-row" *matNoDataRow>
+      <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">Brak rezerwacji do wyświetlenia.</td>
+    </tr>
+  </table>
+
+  <mat-paginator
+    [length]="totalCount"
+    [pageIndex]="query.pageNumber - 1"
+    [pageSize]="query.pageSize"
+    [pageSizeOptions]="pageSizeOptions"
+    (page)="onPageChange($event)">
+  </mat-paginator>
+</div>

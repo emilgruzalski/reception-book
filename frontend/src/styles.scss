@@ -1,0 +1,98 @@
+/* You can add global styles to this file, and also import other style files */
+
+$handset-max-width: 599.98px;
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.table-container {
+  overflow-x: auto;
+
+  table {
+    width: 100%;
+  }
+}
+
+.no-data {
+  padding: 16px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.status {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+
+  &.status-available { background: #e8f5e9; color: #2e7d32; }
+  &.status-occupied { background: #e3f2fd; color: #1565c0; }
+  &.status-cleaning { background: #fff8e1; color: #f57f17; }
+  &.status-outofservice { background: #eceff1; color: #546e7a; }
+
+  &.status-confirmed { background: #e3f2fd; color: #1565c0; }
+  &.status-checkedin { background: #e8f5e9; color: #2e7d32; }
+  &.status-checkedout { background: #eceff1; color: #546e7a; }
+  &.status-cancelled { background: #ffebee; color: #c62828; }
+}
+
+.actions-cell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 16px;
+
+  .full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 16px;
+
+  .search-field {
+    flex: 1 1 320px;
+    max-width: 480px;
+  }
+}
+
+.mat-mdc-snack-bar-container {
+  &.snackbar-success {
+    --mdc-snackbar-container-color: #2e7d32;
+    --mat-mdc-snack-bar-button-color: #fff;
+  }
+
+  &.snackbar-error {
+    --mdc-snackbar-container-color: #c62828;
+    --mat-mdc-snack-bar-button-color: #fff;
+  }
+}
+
+@media (max-width: $handset-max-width) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .page-header {
+    flex-wrap: wrap;
+  }
+
+  .filters .search-field {
+    max-width: none;
+  }
+}

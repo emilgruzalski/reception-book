@@ -1,0 +1,64 @@
+<div class="page-header">
+  <h1>Użytkownicy</h1>
+  <button mat-flat-button color="primary" (click)="openUserDialog()">
+    <mat-icon>person_add</mat-icon>
+    Dodaj użytkownika
+  </button>
+</div>
+
+<div class="table-container mat-elevation-z2">
+  <mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
+
+  <table mat-table [dataSource]="users">
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Imię i nazwisko</th>
+      <td mat-cell *matCellDef="let user">{{ user.firstName }} {{ user.lastName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="userName">
+      <th mat-header-cell *matHeaderCellDef>Login</th>
+      <td mat-cell *matCellDef="let user">{{ user.userName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="email">
+      <th mat-header-cell *matHeaderCellDef>E-mail</th>
+      <td mat-cell *matCellDef="let user">{{ user.email }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="roles">
+      <th mat-header-cell *matHeaderCellDef>Role</th>
+      <td mat-cell *matCellDef="let user">
+        <mat-chip-set>
+          <mat-chip *ngFor="let role of user.roles">{{ role | userRole }}</mat-chip>
+        </mat-chip-set>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th mat-header-cell *matHeaderCellDef>Konto</th>
+      <td mat-cell *matCellDef="let user">
+        <span class="status" [class.status-cancelled]="user.isLockedOut" [class.status-checkedin]="!user.isLockedOut">
+          {{ user.isLockedOut ? 'Zablokowane' : 'Aktywne' }}
+        </span>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="actions">
+      <th mat-header-cell *matHeaderCellDef></th>
+      <td mat-cell *matCellDef="let user" class="actions-cell">
+        <button mat-icon-button matTooltip="Odblokuj" *ngIf="user.isLockedOut" (click)="unlockUser(user)">
+          <mat-icon>lock_open</mat-icon>
+        </button>
+        <button mat-icon-button matTooltip="Edytuj" (click)="openUserDialog(user)">
+          <mat-icon>edit</mat-icon>
+        </button>
+        <button mat-icon-button color="warn" matTooltip="Usuń" (click)="deleteUser(user)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+  </table>
+</div>
