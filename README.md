@@ -6,16 +6,19 @@ has to be done today and makes sure that no room is booked twice.
 The project was created as part of the engineering thesis
 *„Architektura i bezpieczeństwo nowoczesnych aplikacji internetowych na przykładzie aplikacji ReceptionBook”*.
 
-![Dashboard with room statistics, today's arrivals and departures](docs/screenshots/dashboard.png)
+![Room chart with stays as bars and today's departures, arrivals and rooms to clean](docs/screenshots/dashboard.png)
 
 ## What the application does
 
 The user interface is in Polish. The screenshots show demo data with fictional guests.
 
-### Start of the day
+### Room chart
 
-The dashboard (above) shows how many rooms are free, occupied or waiting for cleaning, the occupancy rate and the number
-of guests in the hotel. Below are today's arrivals and departures, with check-in and check-out one click away.
+The home page (above) shows every room in the coming days. Stays are bars, so free periods are visible at a glance, and
+a bar opens its reservation. The chart moves by a week and shows 14 days, or 7 on a phone.
+
+Next to it is the work for today: departures, arrivals and rooms to clean, with the actions one click away. A guest
+cannot be checked in while the room is still occupied or waiting for cleaning.
 
 ### Booking a stay
 
@@ -53,7 +56,7 @@ cannot be deleted.
 
 | | Receptionist | Administrator |
 | --- | :---: | :---: |
-| Dashboard, reservations, check-in and check-out | ✓ | ✓ |
+| Room chart, reservations, check-in and check-out | ✓ | ✓ |
 | Adding and editing guests, changing the status of a room | ✓ | ✓ |
 | Adding, editing and deleting rooms | | ✓ |
 | Deleting guests and reservations | | ✓ |
@@ -61,7 +64,7 @@ cannot be deleted.
 
 The layout also works on a phone:
 
-<img src="docs/screenshots/mobile.png" alt="Dashboard on a phone" width="260">
+<img src="docs/screenshots/mobile.png" alt="Today's departures and arrivals on a phone" width="260">
 
 ## Repository structure
 
