@@ -1,5 +1,6 @@
 $stat-min-width: 180px;
-$list-min-width: 420px;
+// Narrower lists would hide the check-in and check-out buttons.
+$list-min-width: 560px;
 
 .today {
   color: rgba(0, 0, 0, 0.6);
@@ -25,6 +26,7 @@ $list-min-width: 420px;
 
 .stat-value {
   font-size: 32px;
+  line-height: 1.25;
   font-weight: 500;
   margin-top: 8px;
 }
