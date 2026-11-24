@@ -6,7 +6,7 @@ check-in / check-out and employee accounts.
 The project was created as part of the engineering thesis
 *„Architektura i bezpieczeństwo nowoczesnych aplikacji internetowych na przykładzie aplikacji ReceptionBook”*.
 
-The Angular client lives in the [ReceptionBook-Frontend](https://github.com/emilgruzalski/ReceptionBook-Frontend) repository.
+The Angular client lives in the [`frontend`](../frontend) directory.
 
 ## Features
 

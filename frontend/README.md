@@ -5,7 +5,7 @@ Angular client for **ReceptionBook**, a web application for hotel reception staf
 The project was created as part of the engineering thesis
 *„Architektura i bezpieczeństwo nowoczesnych aplikacji internetowych na przykładzie aplikacji ReceptionBook”*.
 
-The REST API lives in the [ReceptionBook-Backend](https://github.com/emilgruzalski/ReceptionBook-Backend) repository.
+The REST API lives in the [`backend`](../backend) directory.
 
 ## Features
 
@@ -32,7 +32,7 @@ Angular 16, Angular Material 16, RxJS, `@auth0/angular-jwt`, Jasmine and Karma, 
 
 ## Getting started
 
-Requirements: Node.js 18 and a running [backend](https://github.com/emilgruzalski/ReceptionBook-Backend).
+Requirements: Node.js 18 and a running [backend](../backend).
 
 ```bash
 npm ci
