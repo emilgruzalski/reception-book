@@ -58,6 +58,17 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   .full-width {
     grid-column: 1 / -1;
   }
+
+  // Angular Material sets display: block on these elements after the global styles are loaded.
+  &.mat-mdc-card-content,
+  &.mat-mdc-dialog-content {
+    display: grid;
+  }
+
+  // Leaves room for the floating labels below the card title.
+  &.mat-mdc-card-content {
+    padding-top: 16px;
+  }
 }
 
 .filters {
