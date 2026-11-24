@@ -1,13 +1,21 @@
-<mat-toolbar color="primary" class="toolbar">
-  <button mat-icon-button (click)="sidenav.toggle()" aria-label="Przełącz menu">
+<header class="header">
+  <button mat-icon-button class="menu-button" *ngIf="isCompact" (click)="sidenav.toggle()" aria-label="Przełącz menu">
     <mat-icon>menu</mat-icon>
   </button>
-  <span class="app-title">ReceptionBook</span>
+  <a class="brand" routerLink="/dashboard">ReceptionBook</a>
+
+  <nav class="nav" *ngIf="!isCompact" aria-label="Główna nawigacja">
+    <ng-container *ngFor="let link of links">
+      <a class="nav-link" [routerLink]="link.path" routerLinkActive="active" ariaCurrentWhenActive="page"
+         *appHasRole="link.roles">{{ link.label }}</a>
+    </ng-container>
+  </nav>
+
   <span class="spacer"></span>
   <ng-container *ngIf="currentUser$ | async as user">
-    <button mat-button [matMenuTriggerFor]="userMenu" class="user-button">
+    <button mat-button [matMenuTriggerFor]="userMenu" class="user-button" aria-label="Konto">
       <mat-icon>account_circle</mat-icon>
-      <span class="user-name" *ngIf="!isHandset">{{ user.firstName }} {{ user.lastName }}</span>
+      <span *ngIf="!isCompact">{{ user.firstName }} {{ user.lastName }}</span>
     </button>
     <mat-menu #userMenu="matMenu" xPosition="before">
       <a mat-menu-item routerLink="/account/change-password">
@@ -20,31 +28,17 @@
       </button>
     </mat-menu>
   </ng-container>
-</mat-toolbar>
+</header>
 
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav #sidenav class="sidenav" [mode]="isHandset ? 'over' : 'side'" [opened]="!isHandset">
-    <mat-nav-list (click)="closeOnHandset(sidenav)">
-      <a mat-list-item routerLink="/dashboard" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>dashboard</mat-icon>
-        <span matListItemTitle>Pulpit</span>
-      </a>
-      <a mat-list-item routerLink="/rooms" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>meeting_room</mat-icon>
-        <span matListItemTitle>Pokoje</span>
-      </a>
-      <a mat-list-item routerLink="/guests" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>people</mat-icon>
-        <span matListItemTitle>Goście</span>
-      </a>
-      <a mat-list-item routerLink="/reservations" routerLinkActive="active-link">
-        <mat-icon matListItemIcon>event</mat-icon>
-        <span matListItemTitle>Rezerwacje</span>
-      </a>
-      <a mat-list-item routerLink="/users" routerLinkActive="active-link" *appHasRole="administratorOnly">
-        <mat-icon matListItemIcon>manage_accounts</mat-icon>
-        <span matListItemTitle>Użytkownicy</span>
-      </a>
+  <mat-sidenav #sidenav class="sidenav" mode="over">
+    <mat-nav-list (click)="sidenav.close()" *ngIf="isCompact">
+      <ng-container *ngFor="let link of links">
+        <a mat-list-item [routerLink]="link.path" routerLinkActive="active-link" *appHasRole="link.roles">
+          <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+          <span matListItemTitle>{{ link.label }}</span>
+        </a>
+      </ng-container>
     </mat-nav-list>
   </mat-sidenav>
 

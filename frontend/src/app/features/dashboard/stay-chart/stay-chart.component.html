@@ -1,0 +1,63 @@
+<div class="scroll" tabindex="0" role="region" aria-label="Grafik pokoi">
+  <div class="chart" [style.--days]="dayCount" [style.--today]="todayIndex">
+    <div class="days">
+      <span class="corner"></span>
+      <span class="day" *ngFor="let day of days" [class.today]="day.isToday" [class.weekend]="day.isWeekend">
+        <span class="weekday">{{ day.isToday ? 'dziś' : (day.date | date:'EEE') }}</span>
+        <span class="number">{{ day.date | date:'d' }}</span>
+      </span>
+    </div>
+
+    <section *ngFor="let group of floors" [attr.aria-label]="'Piętro ' + group.floor">
+      <h2 class="floor">Piętro {{ group.floor }}</h2>
+
+      <div class="row" *ngFor="let row of group.rows; trackBy: trackRow">
+        <div class="room">
+          <span class="room-number">{{ row.room.number }}</span>
+          <span class="room-info">
+            <span class="room-type" [title]="row.room.type | roomType">{{ row.room.type | roomType:'short' }}</span>
+            <span class="room-note" *ngIf="row.room.status === 'Cleaning'">do sprzątania</span>
+            <span class="room-note" *ngIf="row.room.status === 'OutOfService'">wyłączony</span>
+          </span>
+        </div>
+
+        <div class="lane">
+          <span class="today-column" *ngIf="todayIndex >= 0 && todayIndex < dayCount"></span>
+
+          <ng-container *ngFor="let stay of row.stays; trackBy: trackStay">
+            <ng-template #label>
+              <span class="cdk-visually-hidden">
+                {{ stay.reservation.checkInDate | date:'d MMMM' }} – {{ stay.reservation.checkOutDate | date:'d MMMM' }},
+                {{ stay.reservation.status | reservationStatus }}: {{ stay.reservation.guestFullName }}
+              </span>
+              <span class="guest" aria-hidden="true">{{ stay.label }}</span>
+            </ng-template>
+
+            <a *ngIf="isEditable(stay); else finished" class="stay {{ stay.kind }}"
+               [class.starts-before]="stay.startsBefore" [class.ends-after]="stay.endsAfter"
+               [style.grid-column]="stay.startLine + ' / ' + stay.endLine"
+               [routerLink]="['/reservations', stay.reservation.id, 'edit']"
+               [matTooltip]="stay.reservation.guestFullName + ', ' + (stay.reservation.checkInDate | date:'dd.MM') + ' – ' + (stay.reservation.checkOutDate | date:'dd.MM')">
+              <ng-container *ngTemplateOutlet="label"></ng-container>
+            </a>
+            <ng-template #finished>
+              <span class="stay {{ stay.kind }}" [class.starts-before]="stay.startsBefore"
+                    [class.ends-after]="stay.endsAfter" [style.grid-column]="stay.startLine + ' / ' + stay.endLine">
+                <ng-container *ngTemplateOutlet="label"></ng-container>
+              </span>
+            </ng-template>
+          </ng-container>
+        </div>
+      </div>
+    </section>
+
+    <p class="empty" *ngIf="floors.length === 0">Brak pokoi. Administrator może je dodać na liście pokoi.</p>
+  </div>
+</div>
+
+<ul class="legend" aria-label="Legenda">
+  <li><span class="swatch in-house"></span>Zameldowany</li>
+  <li><span class="swatch departing"></span>Wyjazd dziś</li>
+  <li><span class="swatch confirmed"></span>Potwierdzona</li>
+  <li><span class="swatch finished"></span>Wymeldowany</li>
+</ul>

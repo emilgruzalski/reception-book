@@ -1,0 +1,53 @@
+@use '@angular/material' as mat;
+
+// Values used by components are exposed as CSS variables in styles.scss.
+$green: (
+  50: #e6eeea,
+  100: #c9dad2,
+  200: #a3bfb3,
+  300: #7ba293,
+  400: #55836f,
+  500: #356655,
+  600: #285848,
+  700: #1f4a3f,
+  800: #183b32,
+  900: #102a23,
+  A100: #c9dad2,
+  A200: #55836f,
+  A400: #285848,
+  A700: #1f4a3f,
+  contrast: (
+    50: #1f2723, 100: #1f2723, 200: #1f2723, 300: #1f2723, 400: #fff,
+    500: #fff, 600: #fff, 700: #fff, 800: #fff, 900: #fff,
+    A100: #1f2723, A200: #fff, A400: #fff, A700: #fff
+  )
+);
+
+$primary: mat.define-palette($green, 700, 500, 900);
+$accent: mat.define-palette($green, 500, 300, 700);
+$warn: mat.define-palette(mat.$red-palette, 800);
+
+$sans: "'Hanken Grotesk', 'Helvetica Neue', sans-serif";
+$display: "'Marcellus', 'Times New Roman', serif";
+
+$typography: mat.define-typography-config(
+  $font-family: $sans,
+  $headline-5: mat.define-typography-level(34px, 42px, 400, $display, 0),
+  $headline-6: mat.define-typography-level(24px, 32px, 400, $display, 0),
+  $subtitle-1: mat.define-typography-level(16px, 26px, 500, $sans, 0),
+  $subtitle-2: mat.define-typography-level(14px, 22px, 600, $sans, 0),
+  $body-1: mat.define-typography-level(16px, 24px, 400, $sans, 0),
+  $body-2: mat.define-typography-level(15px, 22px, 400, $sans, 0),
+  $caption: mat.define-typography-level(13px, 20px, 400, $sans, 0),
+  $button: mat.define-typography-level(15px, 36px, 600, $sans, 0)
+);
+
+$theme: mat.define-light-theme((
+  color: (primary: $primary, accent: $accent, warn: $warn),
+  typography: $typography,
+  density: 0
+));
+
+@include mat.core();
+@include mat.all-component-themes($theme);
+@include mat.typography-hierarchy($theme);

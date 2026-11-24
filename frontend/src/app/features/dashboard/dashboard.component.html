@@ -1,114 +1,80 @@
-<div class="page-header">
-  <h1>Pulpit</h1>
-  <span class="today" *ngIf="dashboard">{{ dashboard.date | date:'EEEE, d MMMM y' }}</span>
+<div class="layout">
+  <div class="main">
+    <div class="toolbar">
+      <h1>{{ start | date:'d MMMM' }} – {{ end | date:'d MMMM y' }}</h1>
+      <div class="range">
+        <button mat-icon-button aria-label="Wcześniejszy tydzień" (click)="move(-1)">
+          <mat-icon>chevron_left</mat-icon>
+        </button>
+        <button mat-stroked-button (click)="showToday()">Dziś</button>
+        <button mat-icon-button aria-label="Późniejszy tydzień" (click)="move(1)">
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+      <a mat-flat-button color="primary" class="new-reservation" routerLink="/reservations/new">Nowa rezerwacja</a>
+    </div>
+
+    <div class="progress"><mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar></div>
+
+    <app-stay-chart *ngIf="dashboard" [rooms]="rooms" [reservations]="reservations" [start]="start" [today]="today"
+                    [dayCount]="dayCount"></app-stay-chart>
+  </div>
+
+  <aside class="rail" *ngIf="dashboard" aria-label="Dzisiejsza zmiana">
+    <header class="rail-header">
+      <p class="weekday">{{ dashboard.date | date:'EEEE' }}</p>
+      <p class="date">{{ dashboard.date | date:'d MMMM' }}</p>
+      <dl class="figures">
+        <div><dt>Zajęte pokoje</dt><dd>{{ dashboard.occupiedRooms }} z {{ dashboard.totalRooms }}</dd></div>
+        <div><dt>Obłożenie</dt><dd>{{ dashboard.occupancyRate | number:'1.0-1' }}%</dd></div>
+        <div><dt>Goście</dt><dd>{{ dashboard.guestsInHouse }}</dd></div>
+      </dl>
+    </header>
+
+    <section>
+      <h2>Wyjazdy <span class="count">{{ dashboard.departuresToday.length }}</span></h2>
+      <div class="task" *ngFor="let reservation of dashboard.departuresToday">
+        <span class="room">{{ reservation.roomNumber }}</span>
+        <span class="who">
+          {{ reservation.guestFullName }}
+          <span class="note">{{ reservation.totalPrice | currency:'PLN' }}</span>
+        </span>
+        <button mat-stroked-button color="primary" *ngIf="reservation.status === 'CheckedIn'; else departed"
+                (click)="checkOut(reservation)">Wymelduj</button>
+        <ng-template #departed><span class="note">{{ reservation.status | reservationStatus }}</span></ng-template>
+      </div>
+      <p class="none" *ngIf="dashboard.departuresToday.length === 0">Brak wyjazdów na dziś.</p>
+    </section>
+
+    <section>
+      <h2>Przyjazdy <span class="count">{{ dashboard.arrivalsToday.length }}</span></h2>
+      <div class="task" *ngFor="let reservation of dashboard.arrivalsToday">
+        <span class="room">{{ reservation.roomNumber }}</span>
+        <span class="who">
+          {{ reservation.guestFullName }}
+          <span class="note" *ngIf="reservation.status === 'Confirmed' && roomNotReady(reservation) as status; else stay">
+            pokój: {{ status | roomStatus | lowercase }}
+          </span>
+          <ng-template #stay>
+            <span class="note">do {{ reservation.checkOutDate | date:'d MMMM' }}</span>
+          </ng-template>
+          <span class="note" *ngIf="reservation.notes">{{ reservation.notes }}</span>
+        </span>
+        <button mat-flat-button color="primary" *ngIf="reservation.status === 'Confirmed'; else arrived"
+                [disabled]="!!roomNotReady(reservation)" (click)="checkIn(reservation)">Zamelduj</button>
+        <ng-template #arrived><span class="note">{{ reservation.status | reservationStatus }}</span></ng-template>
+      </div>
+      <p class="none" *ngIf="dashboard.arrivalsToday.length === 0">Brak przyjazdów na dziś.</p>
+    </section>
+
+    <section>
+      <h2>Do sprzątania <span class="count">{{ roomsToClean.length }}</span></h2>
+      <div class="task" *ngFor="let room of roomsToClean">
+        <span class="room">{{ room.number }}</span>
+        <span class="who">{{ room.type | roomType:'short' }}</span>
+        <button mat-stroked-button color="primary" (click)="markClean(room)">Gotowy</button>
+      </div>
+      <p class="none" *ngIf="roomsToClean.length === 0">Wszystkie pokoje są posprzątane.</p>
+    </section>
+  </aside>
 </div>
-
-<mat-progress-bar *ngIf="isLoading" mode="indeterminate"></mat-progress-bar>
-
-<ng-container *ngIf="dashboard">
-  <div class="stats">
-    <mat-card class="stat">
-      <mat-icon>hotel</mat-icon>
-      <div class="stat-value">{{ dashboard.availableRooms }}</div>
-      <div class="stat-label">Wolne pokoje</div>
-    </mat-card>
-    <mat-card class="stat">
-      <mat-icon>bed</mat-icon>
-      <div class="stat-value">{{ dashboard.occupiedRooms }}</div>
-      <div class="stat-label">Zajęte pokoje</div>
-    </mat-card>
-    <mat-card class="stat">
-      <mat-icon>cleaning_services</mat-icon>
-      <div class="stat-value">{{ dashboard.roomsToClean }}</div>
-      <div class="stat-label">Do sprzątania</div>
-    </mat-card>
-    <mat-card class="stat">
-      <mat-icon>percent</mat-icon>
-      <div class="stat-value">{{ dashboard.occupancyRate | number:'1.0-1' }}%</div>
-      <div class="stat-label">Obłożenie</div>
-    </mat-card>
-    <mat-card class="stat">
-      <mat-icon>groups</mat-icon>
-      <div class="stat-value">{{ dashboard.guestsInHouse }}</div>
-      <div class="stat-label">Goście w hotelu</div>
-    </mat-card>
-  </div>
-
-  <div class="lists">
-    <section>
-      <h2>Dzisiejsze przyjazdy ({{ dashboard.arrivalsToday.length }})</h2>
-      <div class="table-container mat-elevation-z2">
-        <table mat-table [dataSource]="dashboard.arrivalsToday">
-          <ng-container matColumnDef="roomNumber">
-            <th mat-header-cell *matHeaderCellDef>Pokój</th>
-            <td mat-cell *matCellDef="let reservation">{{ reservation.roomNumber }}</td>
-          </ng-container>
-          <ng-container matColumnDef="guestFullName">
-            <th mat-header-cell *matHeaderCellDef>Gość</th>
-            <td mat-cell *matCellDef="let reservation">{{ reservation.guestFullName }}</td>
-          </ng-container>
-          <ng-container matColumnDef="nights">
-            <th mat-header-cell *matHeaderCellDef>Wyjazd</th>
-            <td mat-cell *matCellDef="let reservation">{{ reservation.checkOutDate | date:'dd.MM.yyyy' }}</td>
-          </ng-container>
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef>Status</th>
-            <td mat-cell *matCellDef="let reservation">
-              <span class="status status-{{ reservation.status | lowercase }}">{{ reservation.status | reservationStatus }}</span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let reservation" class="actions-cell">
-              <button mat-stroked-button color="primary" *ngIf="reservation.status === 'Confirmed'"
-                      (click)="checkIn(reservation)">Zamelduj</button>
-            </td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="arrivalColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: arrivalColumns;"></tr>
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell no-data" [attr.colspan]="arrivalColumns.length">Brak przyjazdów na dziś.</td>
-          </tr>
-        </table>
-      </div>
-    </section>
-
-    <section>
-      <h2>Dzisiejsze wyjazdy ({{ dashboard.departuresToday.length }})</h2>
-      <div class="table-container mat-elevation-z2">
-        <table mat-table [dataSource]="dashboard.departuresToday">
-          <ng-container matColumnDef="roomNumber">
-            <th mat-header-cell *matHeaderCellDef>Pokój</th>
-            <td mat-cell *matCellDef="let reservation">{{ reservation.roomNumber }}</td>
-          </ng-container>
-          <ng-container matColumnDef="guestFullName">
-            <th mat-header-cell *matHeaderCellDef>Gość</th>
-            <td mat-cell *matCellDef="let reservation">{{ reservation.guestFullName }}</td>
-          </ng-container>
-          <ng-container matColumnDef="totalPrice">
-            <th mat-header-cell *matHeaderCellDef>Do zapłaty</th>
-            <td mat-cell *matCellDef="let reservation">{{ reservation.totalPrice | currency:'PLN' }}</td>
-          </ng-container>
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef>Status</th>
-            <td mat-cell *matCellDef="let reservation">
-              <span class="status status-{{ reservation.status | lowercase }}">{{ reservation.status | reservationStatus }}</span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let reservation" class="actions-cell">
-              <button mat-stroked-button color="primary" *ngIf="reservation.status === 'CheckedIn'"
-                      (click)="checkOut(reservation)">Wymelduj</button>
-            </td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="departureColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: departureColumns;"></tr>
-          <tr class="mat-row" *matNoDataRow>
-            <td class="mat-cell no-data" [attr.colspan]="departureColumns.length">Brak wyjazdów na dziś.</td>
-          </tr>
-        </table>
-      </div>
-    </section>
-  </div>
-</ng-container>
