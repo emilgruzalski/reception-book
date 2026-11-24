@@ -9,7 +9,7 @@ The REST API lives in the [`backend`](../backend) directory.
 
 ## Features
 
-- Dashboard with today's arrivals and departures, room status and occupancy
+- Room chart (rooms × days) with today's arrivals, departures, rooms to clean and occupancy
 - Rooms, guests and reservations with server-side paging, sorting, filtering and search
 - Reservation form that shows only rooms available in the selected period
 - Check-in, check-out and cancellation of reservations

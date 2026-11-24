@@ -1,42 +1,149 @@
-$stat-min-width: 180px;
-// Narrower lists would hide the check-in and check-out buttons.
-$list-min-width: 560px;
+$rail-width: 340px;
+$stacked-max-width: 1279.98px;
+$handset-max-width: 599.98px;
 
-.today {
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.stats {
+.layout {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax($stat-min-width, 1fr));
-  gap: 16px;
-  margin-bottom: 24px;
+  grid-template-columns: minmax(0, 1fr) $rail-width;
+  gap: 32px;
+  align-items: start;
 }
 
-.stat {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 16px;
+.main {
+  min-width: 0;
+}
 
-  mat-icon {
-    color: #3f51b5;
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+
+  h1 { margin: 0; }
+}
+
+.range {
+  display: flex;
+  align-items: center;
+}
+
+.new-reservation {
+  margin-left: auto;
+}
+
+.progress {
+  height: 4px;
+  margin: 12px 0 8px;
+}
+
+.rail {
+  padding: 24px;
+  background: var(--rb-surface);
+  border: 1px solid var(--rb-line);
+  border-top: 3px solid var(--rb-brass-line);
+  border-radius: 4px;
+
+  section { margin-top: 32px; }
+
+  h2 {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin: 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--rb-line-strong);
+    font-family: var(--rb-display);
+    font-size: 21px;
+    font-weight: 400;
+    line-height: 28px;
   }
 }
 
-.stat-value {
-  font-size: 32px;
-  line-height: 1.25;
-  font-weight: 500;
-  margin-top: 8px;
+.weekday {
+  margin: 0;
+  color: var(--rb-muted);
+
+  &::first-letter { text-transform: uppercase; }
 }
 
-.stat-label {
-  color: rgba(0, 0, 0, 0.6);
+.date {
+  margin: 0;
+  font-family: var(--rb-display);
+  font-size: 34px;
+  line-height: 42px;
 }
 
-.lists {
+.figures {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 20px 0 0;
+
+  dt {
+    color: var(--rb-muted);
+    font-size: 13px;
+  }
+
+  dd {
+    margin: 2px 0 0;
+    font-size: 17px;
+    font-weight: 600;
+  }
+}
+
+.count {
+  color: var(--rb-muted);
+}
+
+.task {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, $list-min-width), 1fr));
-  gap: 24px;
+  grid-template-columns: 46px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--rb-line);
+
+  &:last-child { border-bottom: 0; }
+}
+
+.room {
+  font-family: var(--rb-display);
+  font-size: 22px;
+  line-height: 1;
+}
+
+.who {
+  font-weight: 500;
+}
+
+.note {
+  display: block;
+  color: var(--rb-muted);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 19px;
+}
+
+.none {
+  margin: 12px 0 0;
+  color: var(--rb-muted);
+}
+
+// On narrower screens today's work goes first, because it is what the receptionist acts on.
+@media (max-width: $stacked-max-width) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+
+  .rail {
+    order: -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 8px 40px;
+
+    section { margin-top: 12px; }
+  }
+}
+
+@media (max-width: $handset-max-width) {
+  .rail { padding: 20px 16px; }
+  .new-reservation { margin-left: 0; width: 100%; }
 }
